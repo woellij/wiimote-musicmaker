@@ -2,7 +2,7 @@
 # encoding: utf-8
 """
 Hand-written pulsar synthesis.
-
+ddd
 """
 
 from pyo import *
