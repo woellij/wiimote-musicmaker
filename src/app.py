@@ -4,7 +4,7 @@ from PyQt5 import uic, QtWidgets
 
 import time
 
-from PyQt5.QtGui import QCursor, QMouseEvent
+from PyQt5.QtGui import QCursor, QMouseEvent, QWindow
 
 from knob import Knob
 from Sounds import SynthSound
@@ -21,8 +21,10 @@ class WiiMotePointer(object):
 
     def __onIrData__(self, data):
         x, y = self.config.positionMapper.map(data)
-        # TODO create mouse event
+        # TODO create mouse event and map buttons
+
         ev = QMouseEvent()
+
         self.config.pointerEventCallback(ev)
 
     def __onButtonEvent__(self, ev):
@@ -45,9 +47,8 @@ class WiiMotePointerConfig(object):
 
 
 class WiiMotePointerReceiver(object):
-    def __init__(self, callback, configFactory):
+    def __init__(self, configFactory):
         super(WiiMotePointerReceiver, self).__init__()
-        self.callback = callback
         self.configFactory = configFactory  # type WiiMotePointerConfig
         self.connecteds = []
         self.thread = None
@@ -67,24 +68,26 @@ class WiiMotePointerReceiver(object):
         self.thread = None
 
     def __checConnected__(self):
-        for wm in [self.connecteds]:
+        for wm in self.connecteds[:]:
             wm = wm  # type: wiimote.WiiMote
             if (wm.connected):
                 self.connecteds.remove(wm)
 
     def __discover__(self):
-        pairs = wiimote.find()
-        if (pairs):
-            for p in pairs:
-                addr, name = p
-                try:
-                    wm = wiimote.connect(addr, name)
-                    if (wm not in self.connecteds):
-                        pointer = WiiMotePointer(wm, self.configFactory())
-                        self.callback(pointer)
-                        self.connecteds.append(wm)
-                except:
-                    pass
+        try:
+            pairs = wiimote.find()
+            if (pairs):
+                for p in pairs:
+                    addr, name = p
+                    try:
+                        wm = wiimote.connect(addr, name)
+                        if (wm not in self.connecteds):
+                            pointer = WiiMotePointer(wm, self.configFactory())
+                            self.connecteds.append(wm)
+                    except:
+                        pass
+        except Exception as e:
+            print(e.message)
 
     def __run__(self):
         while (self.running):
@@ -93,14 +96,13 @@ class WiiMotePointerReceiver(object):
             self.__discover__()
 
 
-class MusicMakerApp(QtWidgets.QWindow):
+class MusicMakerApp(QtWidgets.QWidget):
     def __init__(self,  pointerEventCallback):
         super(MusicMakerApp, self).__init__()
 
         self.k = k = Knob(SynthSound(), 0, 100)
         k.setParent(self)
 
-        self.pointerReceiver = WiiMotePointerReceiver(self.onPointerReceived,
-                                                      lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
+        self.pointerReceiver = WiiMotePointerReceiver(lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
                                                                                    pointerEventCallback))
         self.pointerReceiver.start()

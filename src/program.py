@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from pyo import Server, sys
+
+from PyQt5.QtGui import QWindow
+from PyQt5.QtWidgets import QWidget
+
 from app import MusicMakerApp
 from PyQt5 import QtWidgets, Qt
 import atexit
@@ -21,10 +25,8 @@ def main():
 
     qapp = Qt.QApplication(sys.argv)
 
-    app = MusicMakerApp("window.ui", lambda ev: qapp.sendEvent(app, ev))
-    app.show()
-
-
+    app = MusicMakerApp(lambda ev: qapp.sendEvent(app, ev)) # type: QWidget
+    app.showFullScreen()
 
     sys.exit(qapp.exec_())
 
