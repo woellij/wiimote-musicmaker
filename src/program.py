@@ -21,7 +21,7 @@ def main():
 
     qapp = Qt.QApplication(sys.argv)
 
-    app = MusicMakerApp("window.ui")
+    app = MusicMakerApp("window.ui", lambda ev: qapp.sendEvent(app, ev))
     app.show()
 
 
