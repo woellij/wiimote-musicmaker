@@ -1,19 +1,14 @@
-from PyQt5 import uic, QtWidgets
-import numpy.random as random
 
-import math
-from PyQt5.QtCore import QObject
-from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDial, QWidget
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QUndoCommand
 
-from knob import Knob
-from Sounds import SynthSound
 from drawWidget import QDrawWidget
 from recognizer import Recognizer
 from wiimotePointer import *
 import template
+
+from irMarker import IrMarkerEventFilter
 
 class RelayUndoCommand(QUndoCommand):
     def __init__(self, redo, undo):
@@ -27,69 +22,11 @@ class RelayUndoCommand(QUndoCommand):
         self.__redo()
 
 
-class IrMarkerHelper(QObject):
-
-    markModifierKey = QtCore.Qt.Key_Control
-
-    def __init__(self, widget):
-        super(IrMarkerHelper, self).__init__()
-        self.markers = WiiMotePositionMapper.markers
-        self.widget = widget
-        self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
-        self.markerMode = False
-
-    def eventFilter(self, obj, event):
-        t = event.type()
-        if(type(event) is QtGui.QKeyEvent):
-            if t == QtGui.QKeyEvent.KeyPress:
-                self.keyPressEvent(event)
-            elif t == QtGui.QKeyEvent.KeyRelease:
-                self.keyReleaseEvent(event)
-
-            return True
-
-
-        ev = event
-
-        if t == QtGui.QKeyEvent.MouseButtonRelease or t == QtGui.QKeyEvent.MouseButtonPress:
-            if ev.modifiers() & QtCore.Qt.ControlModifier:
-                self.addIrMarker(ev.localPos())
-
-                return True
-
-        return False
-
-    def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == IrMarkerHelper.markModifierKey:
-            self.markerMode = True
-            self.widget.setCursor(QCursor(QtCore.Qt.CrossCursor))
-            self.widget.update()
-
-
-    def addIrMarker(self, pos):
-        if(len(self.markers) >= 4):
-            distanceFunc = lambda p: math.hypot(p.x() - pos.x(), p.y() - pos.y())
-            distances = map(lambda  p: (p, distanceFunc(p)), self.markers)
-            print distances
-            toRemove = min(distances, key= lambda tuple: tuple[1])
-            self.markers.remove(toRemove[0])
-        self.markers.append(pos)
-        self.widget.update()
-
-    def keyReleaseEvent(self, QKeyEvent):
-        if QKeyEvent.key() == IrMarkerHelper.markModifierKey:
-            self.markerMode=False
-            self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
-            self.widget.update()
-
-
 class MusicMakerApp(QDrawWidget):
-
-
     def __init__(self, pointerEventCallback):
         super(MusicMakerApp, self).__init__(self.onComplete)
 
-        self.markerHelper = IrMarkerHelper(self)
+        self.markerHelper = IrMarkerEventFilter(self)
         self.installEventFilter(self.markerHelper)
 
         self.recognizer = Recognizer()

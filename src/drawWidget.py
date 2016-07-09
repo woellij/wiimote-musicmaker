@@ -21,7 +21,6 @@ class QDrawWidget(QtWidgets.QWidget):
         pass
 
 
-
     def mousePressEvent(self, ev):
         if ev.button() == QtCore.Qt.LeftButton:
             self.drawing = True

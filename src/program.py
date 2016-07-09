@@ -4,17 +4,12 @@
 from pyo import Server, sys
 
 from PyQt5.QtWidgets import QWidget
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-
-import PyQt5.QtCore as qtcore
-
-from PointerWidget import PointerWidget
+from pointerEventFilter import PointerEventFilter
 from wiimotePointer import *
+from remapMouseEventFilter import *
 
 from app import MusicMakerApp
-from PyQt5 import QtWidgets, Qt
-import PyQt5
+from PyQt5 import Qt
 import atexit
 
 s = None # type: Server
@@ -29,60 +24,6 @@ def onExit():
 
 
 
-class PointerEventFilter(QObject):
-    def __init__(self, widget):
-        super(PointerEventFilter, self).__init__()
-
-        self.widget = widget # type: QWidget
-        self.__pointers = dict()
-
-    def pointers(self):
-        return self.__pointers.values()
-
-    def eventFilter(self, obj, event):
-        if not type(event) is PointerEvent:
-            return False
-        ev = event # type: PointerEvent
-        t = ev.type()
-        if t == QMouseEvent.MouseMove:
-            id = ev.pointer.id()
-            pointerWidget = self.__pointers.get(id, None)
-            if not pointerWidget:
-                print "creating pointerwidget"
-                pointerWidget = PointerWidget(obj, ev.pointer)
-                self.__pointers[ev.pointer.id()] = pointerWidget
-                pointerWidget.show()
-
-            pointerWidget.move(ev.pos())
-
-        return False
-
-
-class RemapMouseEventFilter(QObject):
-
-    def __init__(self, qapp, widget):
-        super(RemapMouseEventFilter, self).__init__()
-        self.qapp= qapp  # type: Qt.QApplication
-        self.widget = widget # type: QWidget
-        self.mousePointer = Pointer("mouse", PyQt5.QtCore.Qt.darkYellow)
-
-    def eventFilter(self, obj, event):
-        if(type(event) is QMouseEvent):
-            wUnder = self.qapp.widgetAt(event.pos()) # type: QWidget
-            if(wUnder):
-                localPos = wUnder.mapFromGlobal(event.globalPos())
-                e = event # type: QMouseEvent
-
-                localevent = QMouseEvent(event.type(), localPos, e.globalPos(), e.button(), e.buttons(), e.modifiers())
-                localPointerEvent = PointerEvent(self.mousePointer, localevent)
-                self.qapp.sendEvent(wUnder, localPointerEvent)
-
-            pointerEvent = PointerEvent(self.mousePointer, event)
-            self.qapp.sendEvent(self.qapp, pointerEvent)
-            return True
-
-        return False
-
 def main():
     atexit.register(onExit)
 
@@ -94,7 +35,7 @@ def main():
     filter = RemapMouseEventFilter(qapp, app)
     qapp.installEventFilter(filter)
 
-    pointerFilter = PointerEventFilter(app)
+    pointerFilter = PointerEventFilter(app, qapp)
     qapp.installEventFilter(pointerFilter)
 
     """

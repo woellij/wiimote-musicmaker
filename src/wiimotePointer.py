@@ -8,29 +8,7 @@ from PyQt5.QtWidgets import QUndoStack
 
 import wiimote
 
-class PointerEvent(QMouseEvent):
-    def __init__(self, pointer, QMouseEvent):
-        super(PointerEvent, self).__init__(QMouseEvent)
-        self.pointer = pointer
-
-class PointerWheelEvent(QWheelEvent):
-
-    def __init__(self, pointer, pos):
-        super(PointerWheelEvent, self).__init__(pos, pos)
-        self.pointer = pointer
-
-class Pointer(object):
-    def __init__(self, id, color):
-        super(Pointer, self).__init__()
-        self.__id = id
-        self.__undoStack = QUndoStack()
-        self.color = color
-
-    def undoStack(self):
-        return self.__undoStack
-
-    def id(self): # type: str
-        return self.__id
+from pointer import *
 
 class WiiMotePointer(Pointer):
 
@@ -49,7 +27,6 @@ class WiiMotePointer(Pointer):
                     x, y = self.config.positionMapper.map(data)
                     ev = PointerWheelEvent(self, QPoint(x, y))
                     # TODO calculate angle
-        pass
 
     def __onIrData__(self, data):
         x, y = self.config.positionMapper.map(data)
