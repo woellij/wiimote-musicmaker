@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget
 from PyQt5 import QtCore, Qt
 from wiimotePointer import PointerEvent
 
-from PointerWidget import PointerWidget
+from pointerWidget import PointerWidget
 
 
 class PointerEventFilter(QObject):
@@ -32,7 +32,8 @@ class PointerEventFilter(QObject):
 
             localEvent = QMouseEvent(ev.type(), localPos, ev.globalPos(), ev.button(), ev.buttons(), ev.modifiers())
             localPointerEvent = PointerEvent(ev.pointer, localEvent)
-            widgetUnderPointer.event(localPointerEvent)
+            self.qapp.sendEvent(widgetUnderPointer, localPointerEvent)
+            # widgetUnderPointer.event(localPointerEvent)
 
         if t == QMouseEvent.MouseMove:
             self.getPointerWidget(event).move(ev.pos())

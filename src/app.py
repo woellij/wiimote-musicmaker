@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QDial, QWidget
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QUndoCommand
 
-from drawWidget import QDrawWidget
+from drawWidget import QDrawWidget, PointerDrawEventFilter
 from recognizer import Recognizer
 from wiimotePointer import *
 import template
@@ -22,32 +22,34 @@ class RelayUndoCommand(QUndoCommand):
         self.__redo()
 
 
-class MusicMakerApp(QDrawWidget):
+class MusicMakerApp(QWidget):
     def __init__(self, pointerEventCallback):
-        super(MusicMakerApp, self).__init__(self.onComplete)
+        super(MusicMakerApp, self).__init__()
 
         self.markerHelper = IrMarkerEventFilter(self)
         self.installEventFilter(self.markerHelper)
 
+        self.pointerDrawFilter = PointerDrawEventFilter(self, self.onPointerDrawComplete)
+        self.installEventFilter(self.pointerDrawFilter)
+
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
 
+    def onPointerDrawComplete(self, pointer, points):
+        print points
 
     def paintEvent(self, ev):
+        QWidget.paintEvent(self, ev)
+
         qp = QtGui.QPainter()
         qp.begin(self)
 
         if self.markerHelper.markerMode:
-            self.drawMarkers(qp)
+            self.markerHelper.drawMarkers(qp)
+        self.pointerDrawFilter.drawPoints(qp)
+
         qp.end()
-        QDrawWidget.paintEvent(self, ev)
 
-
-    def drawMarkers(self, qp):
-        for p in self.markerHelper.markers:
-            # optionally fill each circle yellow
-            qp.setBrush(Qt.red)
-            qp.drawEllipse(p, 10, 10)
 
 
     def onComplete(self, points):
