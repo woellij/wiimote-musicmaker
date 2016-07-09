@@ -26,6 +26,33 @@ class RelayUndoCommand(QUndoCommand):
     def redo(self):
         self.__redo()
 
+class PointerEventFilter(QObject):
+    def __init__(self, widget):
+        super(PointerEventFilter, self).__init__()
+
+        self.widget = widget # type: QWidget
+        self.widget.setMouseTracking(True)
+        self.__pointers = dict()
+
+    def pointers(self):
+        return self.__pointers.values()
+
+    def eventFilter(self, obj, event):
+        if not type(event) is PointerEvent:
+            return False
+        ev = event # type: PointerEvent
+        t = ev.type()
+        if t == QtGui.QMouseEvent.MouseMove:
+            print(ev)
+            if ev.button() == Qt.NoButton:
+                self.__pointers[ev.pointer.id()] = (ev.pos(), ev.pointer)
+
+            self.widget.update()
+
+        return False
+
+
+
 class IrMarkerHelper(QObject):
 
     markModifierKey = QtCore.Qt.Key_Control
@@ -34,6 +61,7 @@ class IrMarkerHelper(QObject):
         super(IrMarkerHelper, self).__init__()
         self.markers = WiiMotePositionMapper.markers
         self.widget = widget
+        self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
         self.markerMode = False
 
     def eventFilter(self, obj, event):
@@ -90,23 +118,33 @@ class MusicMakerApp(QDrawWidget):
         self.markerHelper = IrMarkerHelper(self)
         self.installEventFilter(self.markerHelper)
 
+        self.pointerFilter = PointerEventFilter(self)
+        self.installEventFilter(self.pointerFilter)
+
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
 
-        self.setCursor(QCursor(QtCore.Qt.BlankCursor))
-
 
     def paintEvent(self, ev):
-        QDrawWidget.paintEvent(self, ev)
         qp = QtGui.QPainter()
         qp.begin(self)
-        qp.setBrush(QtGui.QColor(0, 0, 0))
+
         if self.markerHelper.markerMode:
-            for p in self.markerHelper.markers:
-                # optionally fill each circle yellow
-                qp.setBrush(Qt.red)
-                qp.drawEllipse(p, 10, 10)
+            self.drawMarkers(qp)
+        self.drawPointers(qp)
         qp.end()
+        QDrawWidget.paintEvent(self, ev)
+
+    def drawPointers(self, qp):
+        for p in self.pointerFilter.pointers():
+            qp.setBrush(p[1].color)
+            qp.drawEllipse(p[0], 5, 5)
+
+    def drawMarkers(self, qp):
+        for p in self.markerHelper.markers:
+            # optionally fill each circle yellow
+            qp.setBrush(Qt.red)
+            qp.drawEllipse(p, 10, 10)
 
 
     def onComplete(self, points):

@@ -13,6 +13,7 @@ from wiimotePointer import *
 
 from app import MusicMakerApp
 from PyQt5 import QtWidgets, Qt
+import PyQt5
 import atexit
 
 s = None # type: Server
@@ -30,13 +31,19 @@ class RemapMouseEventFilter(QObject):
     def __init__(self, qapp, widget):
         super(RemapMouseEventFilter, self).__init__()
         self.qapp= qapp  # type: Qt.QApplication
-        self.widget = widget
-        self.mousePointer = Pointer("mouse")
+        self.widget = widget # type: QWidget
+        self.mousePointer = Pointer("mouse", PyQt5.QtCore.Qt.darkYellow)
 
     def eventFilter(self, obj, event):
         if(type(event) is QMouseEvent):
+            wUnder = self.qapp.widgetAt(event.pos()) # type: QWidget
+            localPos = wUnder.mapFromGlobal(event.globalPos())
+            e = event # type: QMouseEvent
+
+            event = QMouseEvent(event.type(), localPos, e.globalPos(), e.button(), e.buttons(), e.modifiers())
+
             pointerEvent = PointerEvent(self.mousePointer, event)
-            self.qapp.sendEvent(self.widget, pointerEvent)
+            self.qapp.sendEvent(wUnder, pointerEvent)
             return True
 
         return False

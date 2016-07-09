@@ -20,10 +20,11 @@ class PointerWheelEvent(QWheelEvent):
         self.pointer = pointer
 
 class Pointer(object):
-    def __init__(self, id):
+    def __init__(self, id, color):
         super(Pointer, self).__init__()
         self.__id = id
         self.__undoStack = QUndoStack()
+        self.color = color
 
     def undoStack(self):
         return self.__undoStack
@@ -34,7 +35,7 @@ class Pointer(object):
 class WiiMotePointer(Pointer):
 
     def __init__(self, wiimote, config):
-        super(WiiMotePointer, self).__init__(wiimote.btaddr)
+        super(WiiMotePointer, self).__init__(wiimote.btaddr, config.color)
         self.wm = wiimote  # type: wiimote.WiiMote
         self.config = config  # type: WiiMotePointerConfig
         self.wm.buttons.register_callback(self.__onButtonEvent__)
@@ -73,9 +74,10 @@ class WiiMotePositionMapper(object):
 
 
 class WiiMotePointerConfig(object):
-    def __init__(self, positionMapper, pointerEventCallback):
+    def __init__(self, positionMapper, pointerEventCallback, color):
         super(WiiMotePointerConfig, self).__init__()
         self.positionMapper = positionMapper
+        self.color = color
         self.pointerEventCallback = pointerEventCallback
 
 

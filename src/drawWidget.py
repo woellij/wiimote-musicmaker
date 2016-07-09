@@ -23,8 +23,6 @@ class QDrawWidget(QtWidgets.QWidget):
 
 
     def mousePressEvent(self, ev):
-        e = ev # type: QMouseEvent
-        print e.flags()
         if ev.button() == QtCore.Qt.LeftButton:
             self.drawing = True
             self.points = []
