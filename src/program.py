@@ -46,6 +46,17 @@ def main():
     """
     self.pointerReceiver = WiiMotePointerReceiver(lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
                                                                                pointerEventCallback))
+
+
+                widgetUnderPointer = self.qapp.widgetAt(ev.pos())  # type: QWidget
+
+                if (widgetUnderPointer):
+                    localPos = widgetUnderPointer.mapFromGlobal(ev.globalPos())
+
+                    print "sending local pointer event to " + str(type(widgetUnderPointer))
+                    localEvent = QMouseEvent(ev.type(), localPos, ev.globalPos(), ev.button(), ev.buttons(), ev.modifiers())
+                    localPointerEvent = PointerEvent(ev.pointer, localEvent)
+                    self.qapp.sendEvent(widgetUnderPointer, localPointerEvent)
     self.pointerReceiver.start()
     """
 

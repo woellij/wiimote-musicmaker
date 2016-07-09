@@ -35,8 +35,7 @@ class IrMarkerEventFilter(QObject):
         return False
 
     def  drawMarkers(self, qp):
-        for p in self.markerHelper.markers:
-            # optionally fill each circle yellow
+        for p in self.markers:
             qp.setBrush(Qt.red)
             qp.drawEllipse(p, 10, 10)
 

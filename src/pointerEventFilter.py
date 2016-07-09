@@ -25,18 +25,8 @@ class PointerEventFilter(QObject):
         ev = event # type: PointerEvent
         t = ev.type()
 
-        widgetUnderPointer = self.qapp.widgetAt(ev.pos())  # type: QWidget
-
-        if (widgetUnderPointer and not widgetUnderPointer is obj):
-            localPos = widgetUnderPointer.mapFromGlobal(ev.globalPos())
-
-            localEvent = QMouseEvent(ev.type(), localPos, ev.globalPos(), ev.button(), ev.buttons(), ev.modifiers())
-            localPointerEvent = PointerEvent(ev.pointer, localEvent)
-            self.qapp.sendEvent(widgetUnderPointer, localPointerEvent)
-            # widgetUnderPointer.event(localPointerEvent)
-
         if t == QMouseEvent.MouseMove:
-            self.getPointerWidget(event).move(ev.pos())
+            self.getPointerWidget(event).move(ev.screenPos())
 
         return False
 

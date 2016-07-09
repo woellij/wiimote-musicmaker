@@ -36,7 +36,23 @@ class MusicMakerApp(QWidget):
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
 
     def onPointerDrawComplete(self, pointer, points):
-        print points
+        if (len(points) <= 2):
+            return
+
+        points = map(lambda p: (p.x(), p.y()), points)
+        recognized = self.recognizer.recognize(points)
+        template = recognized[0]  # type: template.Template
+
+        print(self.size())
+        if (template):
+            print template.name + " recognized"
+            command = self.resolveCommand(template.name, points)
+            # TODO recognize pointer and add it to that one's stack
+            command.redo()
+
+        else:
+            # TODO output some status
+            pass
 
     def paintEvent(self, ev):
         QWidget.paintEvent(self, ev)
@@ -50,25 +66,6 @@ class MusicMakerApp(QWidget):
 
         qp.end()
 
-
-
-    def onComplete(self, points):
-        if(len(points) <= 2):
-            return
-
-        recognized = self.recognizer.recognize(points)
-        template =  recognized[0] # type: template.Template
-
-        print(self.size())
-        if(template):
-            print template.name + " recognized"
-            command = self.resolveCommand(template.name, points)
-            # TODO recognize pointer and add it to that one's stack
-            command.redo()
-
-        else:
-            # TODO output some status
-            pass
 
     def resolveCommand(self, templateName, points):
         widget = None # type: QWidget
