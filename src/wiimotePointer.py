@@ -3,6 +3,8 @@ import threading
 import time
 
 from PyQt5.QtGui import QCursor, QMouseEvent, QWindow
+from PyQt5.QtWidgets import QUndoStack
+
 import wiimote
 
 
@@ -13,6 +15,7 @@ class WiiMotePointer(object):
         self.wm.buttons.register_callback(self.__onButtonEvent__)
         self.wm.ir.register_callback()
         self.id = self.wm.btaddr
+        self.undoStack = QUndoStack()
 
     def __onIrData__(self, data):
         x, y = self.config.positionMapper.map(data)

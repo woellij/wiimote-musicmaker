@@ -1,11 +1,18 @@
 from PyQt5 import QtWidgets
 
+from PyQt5.QtWidgets import QWidget
+
+
 class KnobListener(object):
     def __init__(self):
         pass
 
     def onValueChange(self, value):
         print value
+
+class MusicMakerWidget(QWidget):
+    def show(self):
+        QWidget.show(self)
 
 
 class Knob(QtWidgets.QDial):
