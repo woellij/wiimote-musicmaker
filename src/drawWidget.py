@@ -52,7 +52,7 @@ class QDrawWidget(QtWidgets.QWidget):
         super(QDrawWidget, self).paintEvent(ev)
         qp = QtGui.QPainter()
         qp.begin(self)
-        # qp.setBrush(QtGui.QColor(0, 0, 0))
+        qp.setBrush(QtGui.QColor(0, 0, 0))
 
         qp.setBrush(QtGui.QColor(20, 255, 190))
         qp.setPen(QtGui.QColor(0, 155, 0))

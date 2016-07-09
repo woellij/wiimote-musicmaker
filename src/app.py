@@ -1,6 +1,8 @@
 from PyQt5 import uic, QtWidgets
 import numpy.random as random
 
+from PyQt5.QtCore import QObject
+from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDial, QWidget
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import QUndoCommand
@@ -23,10 +25,65 @@ class RelayUndoCommand(QUndoCommand):
     def redo(self):
         self.__redo()
 
+class IrMarkerHelper(QObject):
+
+    markModifierKey = QtCore.Qt.Key_Control
+
+    def __init__(self, widget):
+        super(IrMarkerHelper, self).__init__()
+        self.markers = []
+        self.widget = widget
+        self.markerMode = False
+
+    def eventFilter(self, obj, event):
+        t = event.type()
+        if(type(event) is QtGui.QKeyEvent):
+            if t == QtGui.QKeyEvent.KeyPress:
+                self.keyPressEvent(event)
+            elif t == QtGui.QKeyEvent.KeyRelease:
+                self.keyReleaseEvent(event)
+
+            return True
+
+
+        ev = event
+
+        if t == QtGui.QKeyEvent.MouseButtonRelease or t == QtGui.QKeyEvent.MouseButtonPress:
+            if ev.modifiers() & QtCore.Qt.ControlModifier:
+                self.addIrMarker(ev.localPos())
+
+                return True
+
+        return False
+
+    def keyPressEvent(self, QKeyEvent):
+        if QKeyEvent.key() == IrMarkerHelper.markModifierKey:
+            self.markerMode = True
+            self.widget.setCursor(QCursor(QtCore.Qt.CrossCursor))
+            self.widget.update()
+
+
+    def addIrMarker(self, pos):
+        # TODO limit to 4 markers - remove last / closest to new
+        # TODO Pointer position mapper should use the markers - use those markers d
+        self.markers.append(pos)
+        self.widget.update()
+
+    def keyReleaseEvent(self, QKeyEvent):
+        if QKeyEvent.key() == IrMarkerHelper.markModifierKey:
+            self.markerMode=False
+            self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
+            self.widget.update()
+
 
 class MusicMakerApp(QDrawWidget):
+
+
     def __init__(self, pointerEventCallback):
         super(MusicMakerApp, self).__init__(self.onComplete)
+
+        self.markerHelper = IrMarkerHelper(self)
+        self.installEventFilter(self.markerHelper)
 
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
@@ -34,15 +91,17 @@ class MusicMakerApp(QDrawWidget):
         self.setCursor(QCursor(QtCore.Qt.BlankCursor))
 
 
-    def keyPressEvent(self, QKeyEvent):
-        QWidget.keyPressEvent(self, QKeyEvent)
-        if QKeyEvent.key() == QtCore.Qt.Key_Control:
-            self.setCursor(QCursor(QtCore.Qt.CrossCursor))
-
-    def keyReleaseEvent(self, QKeyEvent):
-        QWidget.keyReleaseEvent(self, QKeyEvent)
-        if QKeyEvent.key() == QtCore.Qt.Key_Control:
-            self.setCursor(QCursor(QtCore.Qt.BlankCursor))
+    def paintEvent(self, ev):
+        QDrawWidget.paintEvent(self, ev)
+        qp = QtGui.QPainter()
+        qp.begin(self)
+        qp.setBrush(QtGui.QColor(0, 0, 0))
+        if self.markerHelper.markerMode:
+            for p in self.markerHelper.markers:
+                # optionally fill each circle yellow
+                qp.setBrush(Qt.red)
+                qp.drawEllipse(p, 10, 10)
+        qp.end()
 
 
     def onComplete(self, points):
