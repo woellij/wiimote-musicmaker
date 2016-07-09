@@ -2,20 +2,43 @@ import sys
 import threading
 import time
 
-from PyQt5.QtGui import QCursor, QMouseEvent, QWindow
+from PyQt5.QtCore import QPoint
+from PyQt5.QtGui import QCursor, QMouseEvent, QWindow, QWheelEvent
 from PyQt5.QtWidgets import QUndoStack
 
 import wiimote
 
+class WiiMoteMouseEvent(QMouseEvent):
+
+    def __init__(self, pointer, x, y, wiimote):
+        super(WiiMoteMouseEvent, self).__init__()
+        self.pointer = pointer
+
+class WiiMoteWheelEvent(QWheelEvent):
+
+    def __init__(self, pointer, pos):
+        super(WiiMoteWheelEvent, self).__init__(pos, pos)
+        self.pointer = pointer
 
 class WiiMotePointer(object):
+
     def __init__(self, wiimote, config):
         self.wm = wiimote  # type: wiimote.WiiMote
         self.config = config  # type: WiiMotePointerConfig
         self.wm.buttons.register_callback(self.__onButtonEvent__)
+        self.wm.accelerometer.register_callback(self.__onAccelerometerData__)
         self.wm.ir.register_callback()
         self.id = self.wm.btaddr
         self.undoStack = QUndoStack()
+
+    def __onAccelerometerData__(self, data):
+        if(self.buttons):
+            for b in self.buttons:
+                if b[0] is "A":
+                    x, y = self.config.positionMapper.map(data)
+                    ev = WiiMoteWheelEvent(self, QPoint(x, y))
+                    # TODO calculate angle
+        pass
 
     def __onIrData__(self, data):
         x, y = self.config.positionMapper.map(data)

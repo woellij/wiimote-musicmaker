@@ -31,9 +31,16 @@ class MusicMakerApp(QDrawWidget):
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
 
+        """
+        s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
+        s.start()
+        """
+
+        """
         self.pointerReceiver = WiiMotePointerReceiver(lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
                                                                                    pointerEventCallback))
         self.pointerReceiver.start()
+        """
 
 
     def onComplete(self, points):
@@ -47,6 +54,8 @@ class MusicMakerApp(QDrawWidget):
         if(template):
             print template.name + " recognized"
             command = self.resolveCommand(template.name, points)
+            # TODO recognize pointer and add it to that one's stack
+            command.redo()
 
         else:
             # TODO output some status
@@ -59,6 +68,7 @@ class MusicMakerApp(QDrawWidget):
 
         if(not widget):
             return None
+
         self.setupChildWidget(widget, points)
         return RelayUndoCommand(lambda: widget.show(), lambda: widget.hide())
 

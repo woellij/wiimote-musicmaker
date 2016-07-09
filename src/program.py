@@ -20,8 +20,6 @@ def onExit():
 
 def main():
     atexit.register(onExit)
-    s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
-    s.start()
 
     qapp = Qt.QApplication(sys.argv)
 

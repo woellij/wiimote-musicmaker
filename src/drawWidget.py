@@ -1,6 +1,7 @@
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 
+from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QWidget
 
 
@@ -19,7 +20,11 @@ class QDrawWidget(QtWidgets.QWidget):
     def initUI(self):
         pass
 
+
+
     def mousePressEvent(self, ev):
+        e = ev # type: QMouseEvent
+        print e.flags()
         if ev.button() == QtCore.Qt.LeftButton:
             self.drawing = True
             self.points = []
