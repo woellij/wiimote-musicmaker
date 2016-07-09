@@ -2,41 +2,51 @@ import sys
 import threading
 import time
 
-from PyQt5.QtCore import QPoint
+from PyQt5.QtCore import QPoint, Qt
 from PyQt5.QtGui import QCursor, QMouseEvent, QWindow, QWheelEvent
 from PyQt5.QtWidgets import QUndoStack
 
 import wiimote
 
-class WiiMoteMouseEvent(QMouseEvent):
-
-    def __init__(self, pointer, x, y, wiimote):
-        super(WiiMoteMouseEvent, self).__init__()
+class PointerEvent(QMouseEvent):
+    def __init__(self, pointer, QMouseEvent):
+        super(PointerEvent, self).__init__(QMouseEvent)
         self.pointer = pointer
 
-class WiiMoteWheelEvent(QWheelEvent):
+class PointerWheelEvent(QWheelEvent):
 
     def __init__(self, pointer, pos):
-        super(WiiMoteWheelEvent, self).__init__(pos, pos)
+        super(PointerWheelEvent, self).__init__(pos, pos)
         self.pointer = pointer
 
-class WiiMotePointer(object):
+class Pointer(object):
+    def __init__(self, id):
+        super(Pointer, self).__init__()
+        self.__id = id
+        self.__undoStack = QUndoStack()
+
+    def undoStack(self):
+        return self.__undoStack
+
+    def id(self): # type: str
+        return self.__id
+
+class WiiMotePointer(Pointer):
 
     def __init__(self, wiimote, config):
+        super(WiiMotePointer, self).__init__(wiimote.btaddr)
         self.wm = wiimote  # type: wiimote.WiiMote
         self.config = config  # type: WiiMotePointerConfig
         self.wm.buttons.register_callback(self.__onButtonEvent__)
         self.wm.accelerometer.register_callback(self.__onAccelerometerData__)
         self.wm.ir.register_callback()
-        self.id = self.wm.btaddr
-        self.undoStack = QUndoStack()
 
     def __onAccelerometerData__(self, data):
         if(self.buttons):
             for b in self.buttons:
                 if b[0] is "A":
                     x, y = self.config.positionMapper.map(data)
-                    ev = WiiMoteWheelEvent(self, QPoint(x, y))
+                    ev = PointerWheelEvent(self, QPoint(x, y))
                     # TODO calculate angle
         pass
 
@@ -88,7 +98,7 @@ class WiiMotePointerReceiver(object):
         self.running = False
         self.thread = None
 
-    def __checConnected__(self):
+    def __checkConnected__(self):
         for wm in self.connecteds[:]:
             wm = wm  # type: wiimote.WiiMote
             if (wm.connected):
@@ -113,5 +123,5 @@ class WiiMotePointerReceiver(object):
     def __run__(self):
         while (self.running):
             time.sleep(1)
-            self.__checConnected__()
+            self.__checkConnected__()
             self.__discover__()

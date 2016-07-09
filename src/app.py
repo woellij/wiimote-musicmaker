@@ -31,16 +31,18 @@ class MusicMakerApp(QDrawWidget):
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
 
-        """
-        s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
-        s.start()
-        """
+        self.setCursor(QCursor(QtCore.Qt.BlankCursor))
 
-        """
-        self.pointerReceiver = WiiMotePointerReceiver(lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
-                                                                                   pointerEventCallback))
-        self.pointerReceiver.start()
-        """
+
+    def keyPressEvent(self, QKeyEvent):
+        QWidget.keyPressEvent(self, QKeyEvent)
+        if QKeyEvent.key() == QtCore.Qt.Key_Control:
+            self.setCursor(QCursor(QtCore.Qt.CrossCursor))
+
+    def keyReleaseEvent(self, QKeyEvent):
+        QWidget.keyReleaseEvent(self, QKeyEvent)
+        if QKeyEvent.key() == QtCore.Qt.Key_Control:
+            self.setCursor(QCursor(QtCore.Qt.BlankCursor))
 
 
     def onComplete(self, points):
@@ -79,4 +81,4 @@ class MusicMakerApp(QDrawWidget):
         x = sum(map(lambda t: t[0], points)) / len(points) - widget.width() * 0.5
         y = sum(map(lambda t: t[1], points)) / len(points) - widget.height() * 0.5
         widget.move(x, y)
-        widget.setParent(self),
+        widget.setParent(self)
