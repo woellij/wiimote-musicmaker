@@ -63,6 +63,8 @@ class WiiMotePointer(Pointer):
 
 
 class WiiMotePositionMapper(object):
+    markers = []
+
     def __init__(self):
         pass
 

@@ -1,6 +1,7 @@
 from PyQt5 import uic, QtWidgets
 import numpy.random as random
 
+import math
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QGuiApplication
 from PyQt5.QtWidgets import QDial, QWidget
@@ -31,7 +32,7 @@ class IrMarkerHelper(QObject):
 
     def __init__(self, widget):
         super(IrMarkerHelper, self).__init__()
-        self.markers = []
+        self.markers = WiiMotePositionMapper.markers
         self.widget = widget
         self.markerMode = False
 
@@ -64,8 +65,12 @@ class IrMarkerHelper(QObject):
 
 
     def addIrMarker(self, pos):
-        # TODO limit to 4 markers - remove last / closest to new
-        # TODO Pointer position mapper should use the markers - use those markers d
+        if(len(self.markers) >= 4):
+            distanceFunc = lambda p: math.hypot(p.x() - pos.x(), p.y() - pos.y())
+            distances = map(lambda  p: (p, distanceFunc(p)), self.markers)
+            print distances
+            toRemove = min(distances, key= lambda tuple: tuple[1])
+            self.markers.remove(toRemove[0])
         self.markers.append(pos)
         self.widget.update()
 
