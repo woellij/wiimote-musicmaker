@@ -551,7 +551,8 @@ class CommunicationHandler(threading.Thread):
         self.running = True
         while self.running:
             try:
-                data = self._datasocket.recv(32)
+                data = self._datasocket.recv(32) # type: str
+                data = bytearray(data)
             except bluetooth.BluetoothError:
                 continue
             if len(data) < 2: # disconnect!

@@ -5,18 +5,17 @@ from PyQt5.QtWidgets import *
 from pointer import *
 
 
+
 class RemapMouseEventFilter(QObject):
 
-    def __init__(self, qapp, widget):
+    def __init__(self, qapp):
         super(RemapMouseEventFilter, self).__init__()
         self.qapp= qapp  # type: Qt.QApplication
-        self.widget = widget # type: QWidget
         self.mousePointer = Pointer("mouse", QtCore.Qt.darkYellow)
 
     def eventFilter(self, obj, event):
         if(type(event) is QMouseEvent):
-            pointerEvent = PointerEvent(self.mousePointer, event)
-            self.qapp.sendEvent(obj, pointerEvent)
+            self.qapp.sendEvent(obj, PointerEvent(self.mousePointer, event))
             return True
 
         return False

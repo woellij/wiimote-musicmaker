@@ -2,42 +2,106 @@ import sys
 import threading
 import time
 
-from PyQt5.QtCore import QPoint, Qt
-from PyQt5.QtGui import QCursor, QMouseEvent, QWindow, QWheelEvent
+import PyQt5
+from PyQt5.QtCore import *
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QUndoStack
+from PyQt5.QtWidgets import QWidget
 
 import wiimote
 
 from pointer import *
 
-class WiiMotePointer(Pointer):
 
-    def __init__(self, wiimote, config):
-        super(WiiMotePointer, self).__init__(wiimote.btaddr, config.color)
+class WiiMotePointer(Pointer):
+    BUTTONMAP = {'A': Qt.RightButton,
+                 'B': Qt.LeftButton,
+                 'Down': Qt.Key_Down,
+                 'Home': Qt.Key_Enter,
+                 'Left': Qt.Key_Left,
+                 'Minus': Qt.BackButton,
+                 'One': Qt.Key_1,
+                 'Plus': Qt.ForwardButton,
+                 'Right': Qt.Key_Right,
+                 'Two': Qt.Key_2,
+                 'Up': Qt.Key_Up,
+                 }
+
+    def __init__(self, wiimote, qapp, color):
+        super(WiiMotePointer, self).__init__(wiimote.btaddr, color)
+
+        self.positionMapper = WiiMotePositionMapper()
+        self.qapp = qapp  # type: QApplication
+        self.point = QPoint(0, 0)
+
         self.wm = wiimote  # type: wiimote.WiiMote
-        self.config = config  # type: WiiMotePointerConfig
         self.wm.buttons.register_callback(self.__onButtonEvent__)
         self.wm.accelerometer.register_callback(self.__onAccelerometerData__)
-        self.wm.ir.register_callback()
+        self.wm.ir.register_callback(self.__onIrData__)
 
     def __onAccelerometerData__(self, data):
-        if(self.buttons):
-            for b in self.buttons:
-                if b[0] is "A":
-                    x, y = self.config.positionMapper.map(data)
-                    ev = PointerWheelEvent(self, QPoint(x, y))
-                    # TODO calculate angle
+        for b in self.__mapActiveButtons__():
+            if b == Qt.RightButton:
+                print "sending wheel event"
+                targetWidget, localPos = self.__getLocalEventProperties__()
+                wheelEv = QWheelEvent(localPos, self.point, Qt.NoButton, self.__mapActiveButtons__(),
+                                      self.qapp.keyboardModifiers())
+                ev = PointerWheelEvent(self, wheelEv)
+                self.qapp.sendEvent(targetWidget, ev)
 
     def __onIrData__(self, data):
-        x, y = self.config.positionMapper.map(data)
-        # TODO create mouse event and map buttons
+        x, y = self.positionMapper.map(data)
+        point = QPoint(x, y)
+        changed = not self.point == point
+        self.point = QPoint(x, y)
+        if (changed):
+            self.__sendEvent__(QEvent.MouseMove)
 
-        ev = QMouseEvent()
+    def __mapActiveButtons__(self):
+        buttons = []
+        for name in self.wm.buttons.BUTTONS:
+            active = self.wm.buttons[name]
+            if (active):
+                buttons.append(self.__mapButton__(name))
+        if (len(buttons) > 0):
+            return buttons
+        return [Qt.NoButton]
 
-        self.config.pointerEventCallback(ev)
+    def __mapButton__(self, b):
+        return WiiMotePointer.BUTTONMAP.get(b, Qt.NoButton)
+
+    def __getLocalEventProperties__(self):
+
+        widgetUnderPointer = self.qapp.widgetAt(self.point)  # type: QWidget
+        if (not widgetUnderPointer):
+            return (self.qapp, self.point)
+        localPos = widgetUnderPointer.mapFromGlobal(self.point)
+
+        return (widgetUnderPointer, localPos)
+
+    def __sendEvent__(self, eventType, button=Qt.NoButton):
+
+        buttons = self.__mapActiveButtons__()
+
+        qtButtons = Qt.NoButton
+        for b in buttons:
+            if (b == Qt.RightButton or b == Qt.LeftButton or b == Qt.MidButton):
+                qtButtons = qtButtons or b
+
+        targetWidget, localPos = self.__getLocalEventProperties__()
+
+        print "sending local pointer event to " + str(type(targetWidget))
+
+        localEvent = QMouseEvent(eventType, localPos, self.point, button, qtButtons, self.qapp.keyboardModifiers())
+        localPointerEvent = PointerEvent(self, localEvent)
+        self.qapp.sendEvent(targetWidget, localPointerEvent)
 
     def __onButtonEvent__(self, ev):
-        self.buttons = ev
+        if (len(ev) > 0):
+            for wmb in ev:
+                eventType = QEvent.MouseButtonPress if wmb[1] else QEvent.MouseButtonRelease
+                self.__sendEvent__(eventType, self.__mapButton__(wmb[0]))
 
 
 class WiiMotePositionMapper(object):
@@ -47,28 +111,20 @@ class WiiMotePositionMapper(object):
         pass
 
     def map(self, data):
-        pass
-
-
-class WiiMotePointerConfig(object):
-    def __init__(self, positionMapper, pointerEventCallback, color):
-        super(WiiMotePointerConfig, self).__init__()
-        self.positionMapper = positionMapper
-        self.color = color
-        self.pointerEventCallback = pointerEventCallback
+        # TODO
+        return (0, 0)
 
 
 class WiiMotePointerReceiver(object):
-    def __init__(self, configFactory):
+    def __init__(self, pointerFactory):
         super(WiiMotePointerReceiver, self).__init__()
-        self.configFactory = configFactory  # type WiiMotePointerConfig
+        self.pointerFactory = pointerFactory  # type WiiMotePointerConfig
         self.connecteds = dict()
         self.thread = None
 
-
     def start(self):
         self.running = True
-        if(self.thread):
+        if (self.thread):
             # already running
             return
         self.thread = threading.Thread(target=self.__run__, args=())
@@ -93,14 +149,14 @@ class WiiMotePointerReceiver(object):
                     pass
 
     def __discover__(self):
-            pairs = wiimote.find()
-            if (pairs):
-                for addr, name in pairs:
-                    if addr in self.connecteds:
-                        continue
-                    wm = wiimote.connect(addr, name)
-                    pointer = WiiMotePointer(wm, self.configFactory())
-                    self.connecteds[addr] = (wm, pointer)
+        pairs = wiimote.find()
+        if (pairs):
+            for addr, name in pairs:
+                if addr in self.connecteds:
+                    continue
+                wm = wiimote.connect(addr, name)
+                pointer = self.pointerFactory(wm)
+                self.connecteds[addr] = (wm, pointer)
 
     def __run__(self):
         while (self.running):
