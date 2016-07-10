@@ -18,33 +18,24 @@ class PointerDrawEventFilter(QObject):
 
     def eventFilter(self, obj, event):
 
-
+        if not type(event) is PointerEvent:
+            return False
         t = event.type()
-        if t == QtGui.QKeyEvent.MouseButtonPress:
+        """if t == QtGui.QKeyEvent.MouseButtonPress and event.button() & QtCore.Qt.LeftButton:
             return self.mousePressEvent(event)
-        elif t == QtGui.QKeyEvent.MouseButtonRelease:
+        el """
+        if t == QtGui.QKeyEvent.MouseButtonRelease and event.button() & QtCore.Qt.LeftButton:
             return self.mouseReleaseEvent(event)
-        elif t == QtGui.QMouseEvent.MouseMove:
+        elif t == QtGui.QMouseEvent.MouseMove and event.buttons() & QtCore.Qt.LeftButton:
             return self.mouseMoveEvent(event)
         return False
-
 
     def mouseMoveEvent(self, ev):
         points = self.pointerPoints.get(ev.pointer, None)
         if not points:
-            # not drawing
-            return False
+            self.pointerPoints[ev.pointer] = points = []
         points.append(ev.pos())
         return True
-
-
-    def mousePressEvent(self, ev):
-        if ev.button() == QtCore.Qt.LeftButton:
-            self.pointerPoints[ev.pointer] = points = []
-            points.append(ev.pos())
-            self.widget.update()
-            return True
-        return False
 
     def clearPointsFromPointer(self, pointer):
         self.pointerPoints.pop(pointer)
@@ -54,6 +45,7 @@ class PointerDrawEventFilter(QObject):
         if ev.button() == QtCore.Qt.LeftButton:
             self.widget.update()
             self.completeCallback(ev.pointer, self.pointerPoints.get(ev.pointer, []))
+            self.clearPointsFromPointer(ev.pointer)
             return True
         return False
 

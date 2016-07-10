@@ -23,8 +23,10 @@ class DragOperation(QUndoCommand):
         self.widgetStartPos = self.widget.pos()
         self.dragStartPos = self.__getEventPos__(event)
         self.undone = False
+        self.changed = False
 
     def apply(self, event):
+        self.changed = True
         eventPos = self.__getEventPos__(event)
         self.latestEventDiff = eventDiff = eventPos - self.dragStartPos
         self.latestDragPosition = self.widgetStartPos + eventDiff
@@ -38,6 +40,8 @@ class DragOperation(QUndoCommand):
         self.widget.move(self.widgetStartPos)
 
     def redo(self):
+        if not hasattr(self, "latestDragPosition"):
+            return
         if(self.undone):
             self.widget.move(self.widget.pos() + self.latestEventDiff)
         else:
@@ -70,7 +74,8 @@ class DragEventFilter(QObject):
             if event.type() == QMouseEvent.MouseButtonRelease:
                 operation = self.dragOperations.get(event.pointer, None)
                 if operation:
-                    event.pointer.undoStack().push(operation)
+                    if(operation.changed):
+                        event.pointer.undoStack().push(operation)
                     self.dragOperations.pop(event.pointer)
                     return True
 

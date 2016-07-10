@@ -18,7 +18,7 @@ class WiiMotePointer(Pointer):
     BUTTONMAP = {'A': Qt.RightButton,
                  'B': Qt.LeftButton,
                  'Down': Qt.Key_Down,
-                 'Home': Qt.Key_Enter,
+                 'Home': Qt.MiddleButton,
                  'Left': Qt.Key_Left,
                  'Minus': Qt.BackButton,
                  'One': Qt.Key_1,
