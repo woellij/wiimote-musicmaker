@@ -12,7 +12,7 @@ from app import MusicMakerApp
 from PyQt5 import Qt
 import atexit
 
-program = None
+program = None # type: Program
 
 def onExit():
     if(program):
@@ -38,27 +38,13 @@ class Program(object):
         self.undoRedoFilter = PointerUndoRedoEventFilter()
         qapp.installEventFilter(self.undoRedoFilter)
 
-        """
-           s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
-           s.start()
-           """
+        """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
+        self.s.start()"""
+
         # TODO generate random colors
         pointerFactory = lambda wm: WiiMotePointer(wm, qapp, Qt.Qt.yellow)
         pointerReceiver = WiiMotePointerReceiver(pointerFactory)
         pointerReceiver.start()
-
-        """
-        s = QMouseEvent(QEvent.MouseButtonPress, QPoint(0,0), QPoint(0,0), qtcore.Qt.LeftButton, qtcore.Qt.LeftButton, qapp.keyboardModifiers())
-        qapp.sendEvent(app, s)
-        r = None
-        for i in range(20):
-            r = i * 10
-            ev = QMouseEvent(QEvent.MouseMove, QPoint(r,r), qtcore.Qt.NoButton, qtcore.Qt.NoButton, qapp.keyboardModifiers())
-            qapp.sendEvent(app, ev)
-
-        s = QMouseEvent(QEvent.MouseButtonRelease, QPoint(r,r), qtcore.Qt.LeftButton, qtcore.Qt.LeftButton, qapp.keyboardModifiers())
-        qapp.sendEvent(app, s)
-        """
 
     def onExit(self):
         if hasattr(self, "s"):

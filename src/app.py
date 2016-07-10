@@ -2,12 +2,16 @@
 from PyQt5.QtWidgets import QDial, QWidget
 from PyQt5 import QtGui, QtCore
 
+import os.path
+
 from PyQt5.QtWidgets import QLayout
 from PyQt5.QtWidgets import QUndoCommand
 
 from drawWidget import QDrawWidget, PointerDrawEventFilter
 from recognizer import Recognizer
+from knob import PlayWidget
 from wiimotePointer import *
+from playhead import Playhead
 import template
 
 import numpy as np
@@ -43,6 +47,8 @@ class DeleteCommand(QUndoCommand):
 class MusicMakerApp(QWidget):
     def __init__(self):
         super(MusicMakerApp, self).__init__()
+        self.setMinimumHeight(500)
+        self.setMinimumWidth(800)
 
         self.pointerDrawFilter = PointerDrawEventFilter(self, self.onPointerDrawComplete)
         self.installEventFilter(self.pointerDrawFilter)
@@ -53,6 +59,23 @@ class MusicMakerApp(QWidget):
         self.recognizer = Recognizer()
         self.recognizer.addTemplate(template.Template(template.circle[0], template.circle[1]))
         self.recognizer.addTemplate(template.Template(template.delete[0], template.delete[1]))
+
+        self.head = Playhead(self, self.playheadMoved)
+
+    def playheadMoved(self, xpos, stepping):
+        cs = self.children()
+        lower = xpos - stepping
+        p = cs[0].pos().x()
+        for c in cs:
+            c = c # type: QWidget
+            r = c.geometry() # type: QRect
+            if c.isVisible() and (lower < r.x() < xpos) or (lower < r.right() < xpos):
+                if hasattr(c, "play"):
+                    c.play()
+
+    def adjustSize(self):
+        QWidget.adjustSize(self)
+        self.head.adjustSize()
 
     def onPointerDrawComplete(self, pointer, points):
         if (len(points) <= 2):
@@ -97,7 +120,7 @@ class MusicMakerApp(QWidget):
 
         widget = None # type: QWidget
         if templateName == "circle":
-            widget= QDial()
+            widget= PlayWidget("../samples/clap.wav")
 
         if(not widget):
             return None
@@ -106,8 +129,8 @@ class MusicMakerApp(QWidget):
         return RelayUndoCommand(lambda: widget.show(), lambda: widget.hide())
 
     def setupChildWidget(self, widget, points):
-        widget.setFixedWidth(100)
-        widget.setFixedHeight(100)
+        widget.setFixedWidth(50)
+        widget.setFixedHeight(50)
 
         x, y = np.mean(points,0 )
         x = x - widget.width() * 0.5

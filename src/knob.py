@@ -1,28 +1,33 @@
 from PyQt5 import QtWidgets
 
+from PyQt5.QtGui import *
+import PyQt5.QtCore as QtCore
+from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import QWidget
 
-
-class KnobListener(object):
-    def __init__(self):
-        pass
-
-    def onValueChange(self, value):
-        print value
-
-class MusicMakerWidget(QWidget):
-    def show(self):
-        QWidget.show(self)
+from pyo import *
 
 
-class Knob(QtWidgets.QDial):
-    def __init__(self, knobListener, min, max):
-        super(Knob, self).__init__()
-        self.setMaximum(max)
-        self.setMinimum(min)
+class PlayWidget(QWidget):
+    def __init__(self, filename):
+        super(PlayWidget, self).__init__()
+        self.filename = filename
+        self.sound = QSound(filename, self)
 
-        self.listener = knobListener # type: KnobListener
-        self.valueChanged.connect(self.listener.onValueChange)
+
+    def play(self):
+        if(not self.sound.isFinished()):
+            return
+        self.sound.play()
+
+    def paintEvent(self, QPaintEvent):
+        QWidget.paintEvent(self, QPaintEvent)
+        p = QPainter()
+        p.begin(self)
+        p.setBrush(QtCore.Qt.blue)
+        p.drawEllipse(0,0, self.width()-1, self.height()-1)
+        p.end()
+
 
 
 
