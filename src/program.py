@@ -16,11 +16,14 @@ s = None # type: Server
 app = None # type: MusicMakerApp
 pointerFilter = None
 filter = None
+pointerReceiver = None
 
 def onExit():
     if s:
         s.stop()
         s.shutdown()
+    if pointerReceiver:
+        pointerReceiver.dispose()
 
 
 
@@ -29,8 +32,8 @@ def main():
 
     qapp = Qt.QApplication(sys.argv)
 
-    app = MusicMakerApp(lambda ev: qapp.sendEvent(app, ev)) # type: QWidget
-    app.showFullScreen()
+    app = MusicMakerApp() # type: QWidget
+    app.show()
 
     filter = RemapMouseEventFilter(qapp, app)
     qapp.installEventFilter(filter)
@@ -42,10 +45,11 @@ def main():
     s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
     s.start()
     """
-
+    wiiMotePointerCallback = lambda ev: qapp.sendEvent(app, ev)
+    configFactory = lambda:  WiiMotePointerConfig(WiiMotePositionMapper(), configFactory,  wiiMotePointerCallback)
+    pointerReceiver = WiiMotePointerReceiver(configFactory)
+    pointerReceiver.start()
     """
-    self.pointerReceiver = WiiMotePointerReceiver(lambda: WiiMotePointerConfig(WiiMotePositionMapper(),
-                                                                               pointerEventCallback))
 
 
                 widgetUnderPointer = self.qapp.widgetAt(ev.pos())  # type: QWidget

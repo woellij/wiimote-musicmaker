@@ -26,7 +26,7 @@ class PointerEventFilter(QObject):
         t = ev.type()
 
         if t == QMouseEvent.MouseMove:
-            self.getPointerWidget(event).move(ev.screenPos())
+            self.getPointerWidget(event).move(ev.pos())
 
         return False
 

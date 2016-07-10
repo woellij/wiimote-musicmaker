@@ -498,6 +498,11 @@ class Memory(object):
             self._request_in_progress = False
 
 
+def to_bytes(n, length, endianess='big'):
+    h = '%x' % n
+    s = ('0' * (len(h) % 2) + h).zfill(length * 2).decode('hex')
+    return s if endianess == 'big' else s[::-1]
+
 class CommunicationHandler(threading.Thread):
     
     MODE_DEFAULT = 0x30
@@ -531,14 +536,15 @@ class CommunicationHandler(threading.Thread):
         except NotImplementedError:
             print("socket timeout not implemented with this bluetooth module")
         self.set_report_mode(self.MODE_ACC_IR)
+
     
     def _send(self, *bytes_to_send):
         _debug("sending " + str(bytes_to_send))
-        data_str = self._CMD_SET_REPORT.to_bytes(1,'big')
+        data_str = to_bytes(self._CMD_SET_REPORT, 1,'big')
         bytes_to_send = _flatten(bytes_to_send)
         bytes_to_send[1] |= int(self.rumble)
         for b in bytes_to_send:
-            data_str += b.to_bytes(1,'big')
+            data_str += to_bytes(b, 1,'big')
         self._sendsocket.send(data_str)
 
     def run(self):

@@ -23,7 +23,7 @@ class RelayUndoCommand(QUndoCommand):
 
 
 class MusicMakerApp(QWidget):
-    def __init__(self, pointerEventCallback):
+    def __init__(self):
         super(MusicMakerApp, self).__init__()
 
         self.markerHelper = IrMarkerEventFilter(self)

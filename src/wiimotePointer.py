@@ -62,7 +62,7 @@ class WiiMotePointerReceiver(object):
     def __init__(self, configFactory):
         super(WiiMotePointerReceiver, self).__init__()
         self.configFactory = configFactory  # type WiiMotePointerConfig
-        self.connecteds = []
+        self.connecteds = dict()
         self.thread = None
 
 
@@ -79,27 +79,28 @@ class WiiMotePointerReceiver(object):
         self.running = False
         self.thread = None
 
+    def dispose(self):
+        for wm in map(lambda pair: pair[1][0], self.connecteds.items()):
+            wm.disconnect()
+
     def __checkConnected__(self):
-        for wm in self.connecteds[:]:
-            wm = wm  # type: wiimote.WiiMote
-            if (wm.connected):
-                self.connecteds.remove(wm)
+        for entry in map(lambda pair: pair, self.connecteds.items()):
+            wm = entry[1][0]  # type: wiimote.WiiMote
+            if not wm.connected:
+                try:
+                    wiimote.connect(wm.btaddr, wm.model)
+                except:
+                    pass
 
     def __discover__(self):
-        try:
             pairs = wiimote.find()
             if (pairs):
-                for p in pairs:
-                    addr, name = p
-                    try:
-                        wm = wiimote.connect(addr, name)
-                        if (wm not in self.connecteds):
-                            pointer = WiiMotePointer(wm, self.configFactory())
-                            self.connecteds.append(wm)
-                    except:
-                        pass
-        except Exception as e:
-            print(e.message)
+                for addr, name in pairs:
+                    if addr in self.connecteds:
+                        continue
+                    wm = wiimote.connect(addr, name)
+                    pointer = WiiMotePointer(wm, self.configFactory())
+                    self.connecteds[addr] = (wm, pointer)
 
     def __run__(self):
         while (self.running):

@@ -15,7 +15,6 @@ class RemapMouseEventFilter(QObject):
 
     def eventFilter(self, obj, event):
         if(type(event) is QMouseEvent):
-            print "mapping mouse event"
             pointerEvent = PointerEvent(self.mousePointer, event)
             self.qapp.sendEvent(obj, pointerEvent)
             return True
