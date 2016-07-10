@@ -20,7 +20,12 @@ class Pointer(object):
         self.__undoStack = QUndoStack()
         self.color = color
 
-    def undoStack(self):
+    def undoStack(self): # type: QUndoStack
+        """
+
+        :return: QUndoStack
+        """
+
         return self.__undoStack
 
     def id(self): # type: str

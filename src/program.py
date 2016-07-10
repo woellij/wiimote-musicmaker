@@ -4,7 +4,7 @@
 from pyo import Server, sys
 
 from PyQt5.QtWidgets import QWidget
-from pointerEventFilter import PointerEventFilter, DragEventFilter
+from pointerEventFilter import *
 from wiimotePointer import *
 from remapMouseEventFilter import *
 
@@ -34,6 +34,9 @@ class Program(object):
 
         self.dragFilter = DragEventFilter(qapp)
         qapp.installEventFilter(self.dragFilter)
+
+        self.undoRedoFilter = PointerUndoRedoEventFilter()
+        qapp.installEventFilter(self.undoRedoFilter)
 
         """
            s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()

@@ -11,7 +11,7 @@ class RemapMouseEventFilter(QObject):
     def __init__(self, qapp):
         super(RemapMouseEventFilter, self).__init__()
         self.qapp= qapp  # type: Qt.QApplication
-        self.mousePointer = Pointer("mouse", QtCore.Qt.darkYellow)
+        self.mousePointer = Pointer("mouse", QtCore.Qt.green)
 
     def eventFilter(self, obj, event):
         if(type(event) is QMouseEvent):
