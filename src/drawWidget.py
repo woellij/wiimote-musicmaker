@@ -38,8 +38,11 @@ class PointerDrawEventFilter(QObject):
         return True
 
     def clearPointsFromPointer(self, pointer):
-        self.pointerPoints.pop(pointer)
-        self.widget.update()
+        try:
+            self.pointerPoints.pop(pointer)
+            self.widget.update()
+        except:
+            pass
 
     def mouseReleaseEvent(self, ev):
         if ev.button() == QtCore.Qt.LeftButton:

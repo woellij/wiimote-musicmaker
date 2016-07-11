@@ -12,8 +12,26 @@ import numpy.linalg as linalg
 from itertools import izip
 from template import Template
 
+from multiprocessing import Pool, Process
+
 phi = 0.5 * (-1 + np.sqrt(5))
 numPoints = 255
+
+class RecognizeProzess(Process):
+
+    RESULTS = dict()
+
+    def __init__(self, recognizer, points):
+        super(RecognizeProzess, self).__init__()
+        self.recognizer, self.points = recognizer, points
+        self.res = None
+
+    def run(self):
+        result = self.recognizer.recognize(self.points)
+        RecognizeProzess.RESULTS[self.name] = result
+
+    def result(self):
+        return RecognizeProzess.RESULTS.get(self.name, None)
 
 
 class Recognizer(object):
@@ -106,6 +124,17 @@ class Recognizer(object):
             q[1] = point[1] - centroid[1]
             newPoints = np.append(newPoints, [q], 0)
         return newPoints[1:]
+
+
+    def reconizeAsync(self, points):
+        p = RecognizeProzess(self, points)
+        s = p.start()
+
+        r = p.result()
+        return r
+
+    def runrecognize(self, points, callback):
+        callback(self.recognize(points))
 
     def recognize(self, points):
         points = self.resample(list(points), numPoints)
