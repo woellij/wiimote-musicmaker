@@ -3,7 +3,21 @@ from PyQt5 import QtCore, Qt
 from PyQt5.QtCore import QObject, QPoint
 from PyQt5.QtWidgets import *
 from pointer import *
+from playWidget import PlayWidget
 
+
+class SendPointerEventToFirstPlayWidgetFilter(QObject):
+    def __init__(self, qapp):
+        super(SendPointerEventToFirstPlayWidgetFilter, self).__init__()
+        self.qapp = qapp # type: QApplication
+
+    def eventFilter(self, obj, event):
+        if type(event) is PointerWheelEvent:
+            for w in self.qapp.allWidgets():
+                if type(w) is PlayWidget:
+                    w.event(event)
+
+        return False
 
 
 class RemapMouseEventFilter(QObject):

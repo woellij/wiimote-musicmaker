@@ -9,9 +9,10 @@ class PointerEvent(QMouseEvent):
 
 class PointerWheelEvent(QWheelEvent):
 
-    def __init__(self, pointer, qwheelevent):
+    def __init__(self, pointer, angle, qwheelevent):
         super(PointerWheelEvent, self).__init__(qwheelevent)
         self.pointer = pointer
+        self.pointerAngleDelta = angle
 
 class Pointer(object):
     def __init__(self, id, color):

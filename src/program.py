@@ -41,6 +41,9 @@ class Program(object):
         self.wheelFilter = PointerDownCaptureWheelFilter(qapp)
         qapp.installEventFilter(self.wheelFilter)
 
+        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
+        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
+
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""
 

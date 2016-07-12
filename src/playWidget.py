@@ -7,6 +7,9 @@ from PyQt5.QtWidgets import *
 
 from pyo import *
 
+from pointer import PointerWheelEvent
+
+
 class DrawHelper(object):
     @staticmethod
     def drawTriangle(qp, x, y, width, height):
@@ -75,13 +78,24 @@ class PlayWidget(QWidget):
 
     def wheelEvent(self, ev):
         QWidget.wheelEvent(self, ev)
-        ev = ev # type:QWheelEvent
-        a = ev.angleDelta()
         vol = self.sound.volume()
+        if type(ev) is QWheelEvent:
+            ev = ev # type:QWheelEvent
+            a = ev.angleDelta()
 
-        changeVol = 0.05
-        vol = vol + changeVol if a.y() > 0 else vol - changeVol
-        print vol
+            changeVol = 0.05
+            vol = vol + changeVol if a.y() > 0 else vol - changeVol
+            print a.x(), a.y()
+        elif type(ev) is PointerWheelEvent:
+            ev = ev # type:PointerWheelEvent
+            dif = ev.pointerAngleDelta * 2
+            print dif
+            dif = dif / 180
+            print dif
+            dif = vol * dif
+            vol += dif
+            print dif
+
         if vol > 0 and vol < 1.0:
             self.sound.setVolume(vol)
             self.update()
@@ -95,7 +109,7 @@ class PlayWidget(QWidget):
         p.setBrush(Qt.transparent)
         pen = p.pen()
         pen.setWidth(5)
-        penc = Qt.magenta if self.sound.isPlaying() else Qt.blue if self.soundNum == 1 else Qt.green
+        penc = Qt.magenta if self.sound.isPlaying() else Qt.blue if self.soundNum == 1 else Qt.darkBlue
         pen.setColor(penc)
         p.setPen(pen)
 
