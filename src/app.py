@@ -12,7 +12,7 @@ from src.recognizer import Recognizer
 from src.playWidget import *
 from src.wiimotePointer import *
 from src.playhead import Playhead
-import src.template
+import src.template as template
 
 import numpy as np
 
