@@ -7,6 +7,8 @@ class WiiMotePositionMapper(object):
         markerRigthTop = (0, 768)
         interactionRec = [(markerLeftBottom), (markerRightBottom), (markerRigthTop), (markerRigthTop)]
 
+
+
     # xlim(0, SRC_W)
     # ylim(0, SRC_H)
     # scatter(*zip(*scoords))  # repack points[] to axes[] for plotting
