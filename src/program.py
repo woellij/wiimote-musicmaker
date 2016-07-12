@@ -38,6 +38,9 @@ class Program(object):
         self.undoRedoFilter = PointerUndoRedoEventFilter()
         qapp.installEventFilter(self.undoRedoFilter)
 
+        self.wheelFilter = PointerDownCaptureWheelFilter(qapp)
+        qapp.installEventFilter(self.wheelFilter)
+
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""
 

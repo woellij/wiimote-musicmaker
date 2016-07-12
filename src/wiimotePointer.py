@@ -21,10 +21,10 @@ class WiiMotePointer(Pointer):
                  'Home': Qt.MiddleButton,
                  'Left': Qt.Key_Left,
                  'Minus': Qt.BackButton,
-                 'One': Qt.Key_1,
+                 'One': Qt.ExtraButton3,
                  'Plus': Qt.ForwardButton,
                  'Right': Qt.Key_Right,
-                 'Two': Qt.Key_2,
+                 'Two': Qt.ExtraButton4,
                  'Up': Qt.Key_Up,
                  }
 

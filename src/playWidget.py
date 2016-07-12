@@ -42,23 +42,36 @@ class PlayWidget(QWidget):
     defaultVolume = 0.5
 
     def __init__(self, filename1, filename2, drawFunc = None):
+        self.soundNum = 1
         super(PlayWidget, self).__init__()
+
         self.filename1 = filename1
         self.filename2 = filename2
         self.sound = QSoundEffect()
         self.drawFunc = drawFunc
-        self.sound.setSource(QUrl.fromLocalFile(filename1))
-
+        self.setSource(1)
+        self.sound.playingChanged.connect(self.playingChanged)
         self.sound.setVolume(PlayWidget.defaultVolume)
 
-    def keyReleaseEvent(self, QKeyEvent):
-        QWidget.keyReleaseEvent(self, QKeyEvent)
-        print "keyrelease"
+    def playingChanged(self):
+        self.update()
+
 
     def play(self):
         if(self.sound.isPlaying()):
             return
         self.sound.play()
+
+    def mouseReleaseEvent(self, ev):
+        if ev.button() & Qt.ExtraButton3:
+            self.setSource(1)
+        elif ev.button() & Qt.ExtraButton4:
+            self.setSource(2)
+
+    def setSource(self, num):
+        self.soundNum = num
+        filename = self.filename1 if num == 1 else self.filename2
+        self.sound.setSource(QUrl.fromLocalFile(filename))
 
     def wheelEvent(self, ev):
         QWidget.wheelEvent(self, ev)
@@ -79,11 +92,11 @@ class PlayWidget(QWidget):
 
 
         p.begin(self)
-
-        p.setBrush(Qt.blue)
+        p.setBrush(Qt.transparent)
         pen = p.pen()
         pen.setWidth(5)
-        pen.setColor(Qt.yellow)
+        penc = Qt.magenta if self.sound.isPlaying() else Qt.blue if self.soundNum == 1 else Qt.green
+        pen.setColor(penc)
         p.setPen(pen)
 
         width, height = self.width(), self.height()

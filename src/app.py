@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import QUndoCommand
 
 from drawWidget import QDrawWidget, PointerDrawEventFilter
 from recognizer import Recognizer
-from knob import *
+from playWidget import *
 from wiimotePointer import *
 from playhead import Playhead
 import template
@@ -28,6 +28,7 @@ class RelayUndoCommand(QUndoCommand):
 
     def redo(self):
         self.__redo()
+
 
 class DeleteCommand(QUndoCommand):
 
@@ -162,7 +163,7 @@ class MusicMakerApp(QWidget):
         qp = QPainter()
         qp.begin(self)
 
-        qp.setBrush(Qt.darkGray)
+        qp.setBrush(Qt.black)
         qp.drawRect(self.rect())
 
         if self.markerHelper.markerMode:
@@ -175,6 +176,9 @@ class MusicMakerApp(QWidget):
     def drawStepping(self, qp, stepping):
         pos = 0
         qp.setBrush(Qt.yellow)
+        pen = QPen()
+        pen.setColor(Qt.darkGray)
+        qp.setPen(pen)
         while pos < self.width():
             pos += stepping
             qp.drawLine(pos, 0, pos, self.height())
