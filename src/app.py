@@ -1,3 +1,4 @@
+from queue import Queue
 
 from PyQt5.QtWidgets import QDial, QWidget
 from PyQt5 import *
@@ -62,20 +63,27 @@ class AddCommand(DeleteCommand):
     def __init__(self, parent, widget, inverted=False):
         super(AddCommand, self).__init__(parent, widget, True)
 
-class RecThread(QThread):
-
-    finished = pyqtSignal(object)
+class RecognizeContext(object):
 
     def __init__(self, recognizer, points, pointer):
+        self.recognizer, self.points, self.pointer = recognizer, points, pointer
+
+class RecThread(QThread):
+    finished = pyqtSignal(object)
+    def __init__(self):
         super(RecThread, self).__init__()
-        self.pointer = pointer
-        self.recognizer = recognizer
-        self.points = list(points)
-        self.res = None
+        self.queue = Queue()
+
+    def recognize(self, context):
+        self.queue.put(context)
 
     def run(self):
-        self.res = self.recognizer.recognize(self.points)
-        self.finished.emit(self)
+        while(True):
+            context = self.queue.get() # type: RecognizeContext
+            if context:
+                res = context.recognizer.recognize(context.points)
+                context.res = res
+                self.finished.emit(context)
 
 
 class MusicMakerApp(QWidget):
@@ -107,8 +115,12 @@ class MusicMakerApp(QWidget):
         self.recognizer.addTemplate(template.Template(*template.zig_zag))
         self.recognizer.addTemplate(template.Template(*template.left_square_bracket))
 
-        self.threads = []
+        self.recognizeThread = RecThread()
+        self.recognizeThread.finished.connect(self.recognized)
+        self.recognizeThread.start()
+
         self.head = Playhead(self, self.playheadMoved)
+
 
     def playheadMoved(self, xpos, stepping):
         cs = self.children()
@@ -125,15 +137,15 @@ class MusicMakerApp(QWidget):
         QWidget.adjustSize(self)
         self.head.adjustSize()
 
-    def recognized(self, thread):
+    def recognized(self, context):
         print("recognized")
 
-        recognized = thread.res
+        recognized = context.res
         if not recognized:
             return
 
-        pointer = thread.pointer
-        points = thread.points
+        pointer = context.pointer
+        points = context.points
 
         template = recognized[0]  # type: template.Template
         if (template):
@@ -146,18 +158,12 @@ class MusicMakerApp(QWidget):
                 # TODO output some status
                 pass
 
-        self.threads.remove(thread)
-
-
     def onPointerDrawComplete(self, pointer, points):
         if (len(points) <= 2):
             return
 
-        points = map(lambda p: (p.x(), p.y()), points)
-        thread = RecThread(self.recognizer, points, pointer)
-        thread.finished.connect(self.recognized)
-        thread.start()
-        self.threads.append(thread)
+        points = list(map(lambda p: (p.x(), p.y()), points))
+        self.recognizeThread.recognize(RecognizeContext(self.recognizer, points, pointer))
 
 
     def paintEvent(self, ev):

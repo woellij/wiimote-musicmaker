@@ -1,3 +1,4 @@
+import time
 from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import *
@@ -45,7 +46,7 @@ class PlayWidget(QWidget):
     def __init__(self, filename1, filename2, drawFunc = None):
         self.soundNum = 1
         super(PlayWidget, self).__init__()
-
+        self.playStart = time.time()
         self.filename1 = filename1
         self.filename2 = filename2
         self.sound = QSoundEffect()
@@ -61,6 +62,11 @@ class PlayWidget(QWidget):
     def play(self):
         if(self.sound.isPlaying()):
             return
+        now = time.time()
+        if(now - self.playStart < 0.5):
+            return
+
+        self.playStart = now
         self.sound.play()
 
     def mouseReleaseEvent(self, ev):
@@ -73,6 +79,7 @@ class PlayWidget(QWidget):
         self.soundNum = num
         filename = self.filename1 if num == 1 else self.filename2
         self.sound.setSource(QUrl.fromLocalFile(filename))
+        self.update()
 
     def wheelEvent(self, ev):
         QWidget.wheelEvent(self, ev)
@@ -98,7 +105,6 @@ class PlayWidget(QWidget):
     def paintEvent(self, QPaintEvent):
         QWidget.paintEvent(self, QPaintEvent)
         p = QPainter()
-
 
         p.begin(self)
         p.setBrush(Qt.transparent)

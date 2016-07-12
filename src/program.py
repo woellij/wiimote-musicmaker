@@ -1,7 +1,10 @@
-    #!/usr/bin/python
+# !/usr/bin/python
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget
+
+from src.capturePointerDownWheelFilter import PointerDownCaptureWheelFilter
+from src.dragEventFilter import DragEventFilter
 from src.pointerEventFilter import *
 from src.wiimotePointer import *
 from src.remapMouseEventFilter import *
@@ -10,11 +13,13 @@ from src.app import MusicMakerApp
 from PyQt5 import Qt
 import atexit
 
-program = None # type: Program
+program = None  # type: Program
+
 
 def onExit():
-    if(program):
+    if (program):
         program.onExit()
+
 
 class Program(object):
     def __init__(self):
@@ -57,11 +62,13 @@ class Program(object):
         if hasattr(self, "pointerReceiver"):
             self.pointerReceiver.dispose()
 
+
 def main():
     atexit.register(onExit)
     program = Program()
 
     sys.exit(program.qapp.exec_())
+
 
 if __name__ == '__main__':
     main()
