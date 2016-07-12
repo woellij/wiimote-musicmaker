@@ -67,6 +67,15 @@ def main():
     atexit.register(onExit)
     program = Program()
 
+    screen_resolution = program.qapp.desktop().screenGeometry()
+    width, height = screen_resolution.width(), screen_resolution.height()
+    widthDif, heightDif = 50, 50
+    width, height = width - widthDif, height - heightDif
+    WiiMotePositionMapper.markers.append((widthDif, heightDif))
+    WiiMotePositionMapper.markers.append((width, - heightDif))
+    WiiMotePositionMapper.markers.append((widthDif, height))
+    WiiMotePositionMapper.markers.append((width, height))
+
     sys.exit(program.qapp.exec_())
 
 

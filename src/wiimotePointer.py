@@ -64,7 +64,7 @@ class WiiMotePointer(Pointer):
 
         config = {
             'freq': 120,  # Hz
-            'mincutoff': 0.1,  # FIXME
+            'mincutoff': 1,  # FIXME
             'beta': 0.1,  # FIXME
             'dcutoff': 1.0  # this one should be ok
         }

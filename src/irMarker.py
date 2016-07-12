@@ -10,7 +10,7 @@ class IrMarkerEventFilter(QObject):
     def __init__(self, widget):
         super(IrMarkerEventFilter, self).__init__()
         self.markers = WiiMotePositionMapper.markers
-        self.widget = widget
+        self.widget = widget # type: QWidget
         self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
         self.markerMode = False
 
@@ -34,9 +34,11 @@ class IrMarkerEventFilter(QObject):
 
         return False
 
-    def  drawMarkers(self, qp):
+    def drawMarkers(self, qp):
         for p in self.markers:
             qp.setBrush(Qt.red)
+            if not type(p) is QPoint:
+                p = QPoint(*p)
             qp.drawEllipse(p, 10, 10)
 
 
