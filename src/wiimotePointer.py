@@ -188,20 +188,33 @@ class WiiMotePointerReceiver(object):
         for entry in map(lambda pair: pair, self.connecteds.items()):
             wm = entry[1][0]  # type: wiimote.WiiMote
             if not wm.connected:
-                try:
-                    wiimote.connect(wm.btaddr, wm.model)
-                except:
-                    pass
+                # remove to cleanup
+                self.connecteds.pop(wm.btaddr, None)
+                # try reconnect
+                self.__connect__(wm.btaddr, wm.model)
+
+    def __connect__(self, addr, name):
+        try:
+            wm = wiimote.connect(addr, name)
+            pointer = self.pointerFactory(wm)
+            self.connecteds[addr] = (wm, pointer)
+            print("connected to: " + addr)
+        except Exception as e:
+            print("error connecting to : " + addr + " " + str(e))
+            pass
 
     def __discover__(self):
-        pairs = wiimote.find()
-        if (pairs):
-            for addr, name in pairs:
-                if addr in self.connecteds:
-                    continue
-                wm = wiimote.connect(addr, name)
-                pointer = self.pointerFactory(wm)
-                self.connecteds[addr] = (wm, pointer)
+        try:
+            pairs = wiimote.find()
+            if (pairs):
+                for addr, name in pairs:
+                    if addr in self.connecteds:
+                        # already connected
+                        continue
+                    self.__connect__(addr, name)
+
+        except:
+            pass
 
     def __run__(self):
         while (self.running):
