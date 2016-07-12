@@ -9,7 +9,7 @@
 
 import numpy as np
 import numpy.linalg as linalg
-from itertools import izip
+from itertools import zip_longest as izip
 from template import Template
 
 from multiprocessing import Pool, Process

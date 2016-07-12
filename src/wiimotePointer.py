@@ -142,8 +142,6 @@ class WiiMotePointer(Pointer):
 
         targetWidget, localPos = self.__getLocalEventProperties__()
 
-        print "sending local pointer event to " + str(type(targetWidget))
-
         localEvent = QMouseEvent(eventType, localPos, self.point, button, qtButtons, self.qapp.keyboardModifiers())
         localPointerEvent = PointerEvent(self, localEvent)
         self.qapp.sendEvent(targetWidget, localPointerEvent)

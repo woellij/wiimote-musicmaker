@@ -5,8 +5,6 @@ from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
 
-from pyo import *
-
 from pointer import PointerWheelEvent
 
 
@@ -85,16 +83,13 @@ class PlayWidget(QWidget):
 
             changeVol = 0.05
             vol = vol + changeVol if a.y() > 0 else vol - changeVol
-            print a.x(), a.y()
+
         elif type(ev) is PointerWheelEvent:
             ev = ev # type:PointerWheelEvent
             dif = ev.pointerAngleDelta * 2
-            print dif
             dif = dif / 180
-            print dif
             dif = vol * dif
             vol += dif
-            print dif
 
         if vol > 0 and vol < 1.0:
             self.sound.setVolume(vol)

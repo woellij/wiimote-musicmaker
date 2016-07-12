@@ -1,8 +1,6 @@
     #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from pyo import Server, sys
-
 from PyQt5.QtWidgets import QWidget
 from pointerEventFilter import *
 from wiimotePointer import *

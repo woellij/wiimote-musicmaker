@@ -94,7 +94,7 @@ class WheelOperation(object):
 
 
     def apply(self, event):
-        print event
+        print(event)
 
 
 class PointerDownCaptureWheelFilter(QObject):

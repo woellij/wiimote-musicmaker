@@ -124,8 +124,7 @@ class MusicMakerApp(QWidget):
         self.head.adjustSize()
 
     def recognized(self, thread):
-        print "recognized"
-        self.threads.remove(thread)
+        print("recognized")
 
         recognized = thread.res
         if not recognized:
@@ -137,13 +136,15 @@ class MusicMakerApp(QWidget):
         template = recognized[0]  # type: template.Template
         if (template):
             if (recognized[1] > 0.5):
-                print template.name + " recognized: " + str(recognized[1])
+                print(template.name + " recognized: " + str(recognized[1]))
                 command = self.resolveCommand(template.name, points)
                 if (command):
                     pointer.undoStack().push(command)
             else:
                 # TODO output some status
                 pass
+
+        self.threads.remove(thread)
 
 
     def onPointerDrawComplete(self, pointer, points):
@@ -205,7 +206,7 @@ class MusicMakerApp(QWidget):
     def setupChildWidget(self, widget, points):
         widget.setFixedWidth(50)
         widget.setFixedHeight(50)
-
+        points = list(points)
         x, y = np.mean(points,0 )
         x = x - widget.width() * 0.5
         y = y - widget.height() * 0.5

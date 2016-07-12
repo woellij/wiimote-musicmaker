@@ -50,7 +50,6 @@ class IrMarkerEventFilter(QObject):
         if (len(self.markers) >= 4):
             distanceFunc = lambda p: math.hypot(p.x() - pos.x(), p.y() - pos.y())
             distances = map(lambda p: (p, distanceFunc(p)), self.markers)
-            print distances
             toRemove = min(distances, key=lambda tuple: tuple[1])
             self.markers.remove(toRemove[0])
         self.markers.append(pos)
