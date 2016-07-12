@@ -69,12 +69,14 @@ class RecThread(QThread):
     def __init__(self, recognizer, points, pointer):
         super(RecThread, self).__init__()
         self.pointer = pointer
-        self.recognizer, self.points = recognizer, points
+        self.recognizer = recognizer
+        self.points = list(points)
         self.res = None
 
     def run(self):
         self.res = self.recognizer.recognize(self.points)
         self.finished.emit(self)
+
 
 class MusicMakerApp(QWidget):
 
@@ -206,7 +208,7 @@ class MusicMakerApp(QWidget):
     def setupChildWidget(self, widget, points):
         widget.setFixedWidth(50)
         widget.setFixedHeight(50)
-        points = list(points)
+
         x, y = np.mean(points,0 )
         x = x - widget.width() * 0.5
         y = y - widget.height() * 0.5
