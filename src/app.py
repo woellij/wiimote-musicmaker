@@ -7,16 +7,16 @@ import os.path
 from PyQt5.QtWidgets import QLayout
 from PyQt5.QtWidgets import QUndoCommand
 
-from drawWidget import QDrawWidget, PointerDrawEventFilter
-from recognizer import Recognizer
-from playWidget import *
-from wiimotePointer import *
-from playhead import Playhead
-import template
+from src.drawWidget import QDrawWidget, PointerDrawEventFilter
+from src.recognizer import Recognizer
+from src.playWidget import *
+from src.wiimotePointer import *
+from src.playhead import Playhead
+import src.template
 
 import numpy as np
 
-from irMarker import IrMarkerEventFilter
+from src.irMarker import IrMarkerEventFilter
 
 class RelayUndoCommand(QUndoCommand):
     def __init__(self, redo, undo):

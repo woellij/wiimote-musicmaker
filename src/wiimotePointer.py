@@ -8,12 +8,13 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QUndoStack
 from PyQt5.QtWidgets import QWidget
-from oneEuroFilter import *
+from src.oneEuroFilter import *
 import time
-import wiimote
+import src.wiimote
 
-from pointer import *
+from src.pointer import *
 import numpy as np
+
 
 
 def unit_vector(vector):

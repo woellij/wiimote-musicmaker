@@ -6,10 +6,10 @@ from PyQt5 import QtCore, Qt
 
 from PyQt5.QtWidgets import QUndoCommand
 
-from app import MusicMakerApp
-from wiimotePointer import *
+from src.app import MusicMakerApp
+from src.wiimotePointer import *
 
-from pointerWidget import PointerWidget
+from src.pointerWidget import PointerWidget
 
 class DragOperation(QUndoCommand):
     """

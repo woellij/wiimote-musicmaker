@@ -1,7 +1,7 @@
 import math
 from PyQt5.QtCore import QObject
 from PyQt5 import QtGui, QtCore
-from wiimotePointer import *
+from src.wiimotePointer import *
 
 
 class IrMarkerEventFilter(QObject):

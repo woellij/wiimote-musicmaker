@@ -2,11 +2,11 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5.QtWidgets import QWidget
-from pointerEventFilter import *
-from wiimotePointer import *
-from remapMouseEventFilter import *
+from src.pointerEventFilter import *
+from src.wiimotePointer import *
+from src.remapMouseEventFilter import *
 
-from app import MusicMakerApp
+from src.app import MusicMakerApp
 from PyQt5 import Qt
 import atexit
 

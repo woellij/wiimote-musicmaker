@@ -5,7 +5,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
 
-from pointer import PointerWheelEvent
+from src.pointer import PointerWheelEvent
 
 
 class DrawHelper(object):

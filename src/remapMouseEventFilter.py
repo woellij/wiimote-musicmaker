@@ -2,8 +2,8 @@ from PyQt5 import QtCore, Qt
 
 from PyQt5.QtCore import QObject, QPoint
 from PyQt5.QtWidgets import *
-from pointer import *
-from playWidget import PlayWidget
+from src.pointer import *
+from src.playWidget import PlayWidget
 
 
 class SendPointerEventToFirstPlayWidgetFilter(QObject):
