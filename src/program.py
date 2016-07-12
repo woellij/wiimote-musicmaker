@@ -69,7 +69,7 @@ def main():
 
     screen_resolution = program.qapp.desktop().screenGeometry()
     width, height = screen_resolution.width(), screen_resolution.height()
-    widthDif, heightDif = 50, 50
+    widthDif, heightDif = 0, 0
     width, height = width - widthDif, height - heightDif
     WiiMotePositionMapper.markers.append((widthDif, heightDif))
     WiiMotePositionMapper.markers.append((width, - heightDif))
