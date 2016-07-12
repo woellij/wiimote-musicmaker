@@ -8,6 +8,8 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QUndoStack
 from PyQt5.QtWidgets import QWidget
+
+from src import wiimote
 from src.oneEuroFilter import *
 import time
 import src.wiimote
@@ -15,6 +17,7 @@ import src.wiimote
 from src.pointer import *
 import numpy as np
 
+from src.wiimotePositionMapper import WiiMotePositionMapper
 
 
 def unit_vector(vector):
@@ -30,6 +33,7 @@ def angle_between(v1, v2):
         return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)), directed
     except:
         return 0
+
 
 class WiiMotePointer(Pointer):
     BUTTONMAP = {'A': Qt.RightButton,
@@ -51,7 +55,7 @@ class WiiMotePointer(Pointer):
         self.positionMapper = WiiMotePositionMapper()
         self.qapp = qapp  # type: QApplication
         self.point = QPoint(0, 0)
-        self.latestNormal = (0,0)
+        self.latestNormal = (0, 0)
 
         self.wm = wiimote  # type: wiimote.WiiMote
         self.wm.buttons.register_callback(self.__onButtonEvent__)
@@ -68,12 +72,10 @@ class WiiMotePointer(Pointer):
         self.angleFilter = OneEuroFilter(**config)
         self.angles = []
 
-
     def __onAccelerometerData__(self, data):
         dif = 512
-        x , y = data[0] - dif, data[2] - dif
+        x, y = data[0] - dif, data[2] - dif
         currentNormal = np.array([x, 0]) + np.array([0, y])
-
 
         angle, direction = angle_between(currentNormal, self.latestNormal)
         angle = angle * (180 / np.pi)
@@ -93,7 +95,8 @@ class WiiMotePointer(Pointer):
                     self.angles = []
 
                     targetWidget, localPos = self.__getLocalEventProperties__()
-                    wheelEv = QWheelEvent(localPos, self.point, QPoint(0,0), QPoint(0, angle), abs(angle), Qt.Vertical , self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
+                    wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), abs(angle), Qt.Vertical,
+                                          self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
                     ev = PointerWheelEvent(self, angle, wheelEv)
                     self.qapp.sendEvent(targetWidget, ev)
 
@@ -155,17 +158,6 @@ class WiiMotePointer(Pointer):
                 if mapped == Qt.RightButton:
                     self.angles = []
                 self.__sendEvent__(eventType, mapped)
-
-
-class WiiMotePositionMapper(object):
-    markers = []
-
-    def __init__(self):
-        pass
-
-    def map(self, data):
-        # TODO
-        return (0, 0)
 
 
 class WiiMotePointerReceiver(object):
