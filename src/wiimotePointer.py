@@ -103,7 +103,11 @@ class WiiMotePointer(Pointer):
         self.latestNormal = currentNormal
 
     def __onIrData__(self, data):
-        x, y = self.positionMapper.map(data)
+        p = self.positionMapper.map(data)
+        if not p:
+            return
+        x, y = p[0], p[1]
+
         point = QPoint(x, y)
         changed = not self.point == point
         self.point = QPoint(x, y)
@@ -185,7 +189,8 @@ class WiiMotePointerReceiver(object):
             wm.disconnect()
 
     def __checkConnected__(self):
-        for entry in map(lambda pair: pair, self.connecteds.items()):
+        connected = list(self.connecteds.items())
+        for entry in map(lambda pair: pair, connected):
             wm = entry[1][0]  # type: wiimote.WiiMote
             if not wm.connected:
                 # remove to cleanup
