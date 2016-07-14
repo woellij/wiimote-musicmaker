@@ -44,12 +44,12 @@ class RemapMouseEventFilter(QObject):
                 if(target):
                     localPos = target.mapFromGlobal(pos)
                     ev = QMouseEvent(t, localPos, pos, button, self.qapp.mouseButtons(), self.qapp.keyboardModifiers())
-                    self.qapp.sendEvent(target, PointerEvent(self.mousePointer, ev))
+                    self.qapp.postEvent(target, PointerEvent(self.mousePointer, ev))
                 return True
 
         if(type(event) is QMouseEvent):
             self.latestMousePos = (event.globalPos().x(), event.globalPos().y()) # type: QMouseEvent
-            self.qapp.sendEvent(obj, PointerEvent(self.mousePointer, event))
+            self.qapp.postEvent(obj, PointerEvent(self.mousePointer, event))
             return True
 
 

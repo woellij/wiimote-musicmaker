@@ -36,7 +36,6 @@ class WiiMotePositionMapper(object):
     def filterMarkers(self, data):
         markerDistance = ""
 
-        if
 
     def do(self, sx1, sy1, sx2, sy2, sx3, sy3, sx4, sy4, DEST_W, DEST_H):
         SRC_W, SRC_H = 1024, 768

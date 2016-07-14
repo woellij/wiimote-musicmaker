@@ -60,7 +60,9 @@ class PointerEventFilter(QObject):
         id = ev.pointer.id()
         pointerWidget = self.__pointers.get(id, None)
         if not pointerWidget:
-            pointerWidget = PointerWidget(self.widget, ev.pointer)
+            pointerWidget = PointerWidget(ev.pointer)
+            pointerWidget.moveToThread(QApplication.instance().thread())
+            pointerWidget.setParent(self.widget)
             self.__pointers[id] = pointerWidget
             pointerWidget.show()
         return pointerWidget

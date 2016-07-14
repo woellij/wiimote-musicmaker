@@ -4,8 +4,8 @@ from PyQt5.QtCore import Qt, QPoint
 from PyQt5 import QtCore
 
 class PointerWidget(QWidget):
-    def __init__(self, parent, pointer):
-        super(PointerWidget, self).__init__(parent)
+    def __init__(self, pointer):
+        super(PointerWidget, self).__init__()
 
         self.pointer = pointer
         self.setFixedWidth(10)
