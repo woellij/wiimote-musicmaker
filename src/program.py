@@ -92,7 +92,7 @@ def main():
     WiiMotePositionMapper.markers.append((width, height))
 
     WiiMotePositionMapper.dest_w = screen_resolution.width() + 2 * widthDif
-    WiiMotePositionMapper.dest_h = screen_resolution.height + 2 * heightDif
+    WiiMotePositionMapper.dest_h = screen_resolution.height() + 2 * heightDif
 
     sys.exit(program.qapp.exec_())
 

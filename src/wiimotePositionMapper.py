@@ -22,9 +22,6 @@ class WiiMotePositionMapper(object):
 
         irDots = list(map(lambda d: (d["x"], d["y"]), data))
 
-
-        irDots = sort(irDots,0,)
-        print(irDots)
         try:
             irDots = self.orderIrDots(irDots)
             irDots = self.filterMarkers(irDots)
