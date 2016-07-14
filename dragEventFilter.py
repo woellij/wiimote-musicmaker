@@ -1,12 +1,10 @@
-
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
-
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication, QUndoCommand
+from app import MusicMakerApp
 
-from src.app import MusicMakerApp
-from src.pointer import PointerEvent
+from pointer import PointerEvent
 
 
 class DragOperation(QUndoCommand):
@@ -67,6 +65,7 @@ class DragEventFilter(QObject):
                     return False
 
                 self.dragOperations[event.pointer] = DragOperation(widget, event)
+                print("DragEventFilter handling mouse left button press")
                 return True
             if event.type() == QMouseEvent.MouseButtonRelease:
                 operation = self.dragOperations.get(event.pointer, None)
@@ -74,6 +73,7 @@ class DragEventFilter(QObject):
                     if (operation.changed):
                         event.pointer.undoStack().push(operation)
                     self.dragOperations.pop(event.pointer)
+                    print("DragEventFilter handling mouse left button release")
                     return True
 
         if event.type() == QMouseEvent.MouseMove:

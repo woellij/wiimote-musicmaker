@@ -1,12 +1,11 @@
 import time
-from PyQt5 import QtWidgets
 
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtMultimedia import *
 from PyQt5.QtWidgets import *
 
-from src.pointer import PointerWheelEvent
+from pointer import PointerWheelEvent
 
 
 class DrawHelper(object):
@@ -70,6 +69,7 @@ class PlayWidget(QWidget):
         self.sound.play()
 
     def mouseReleaseEvent(self, ev):
+        print("received pointer button release event")
         if ev.button() & Qt.ExtraButton3:
             self.setSource(1)
         elif ev.button() & Qt.ExtraButton4:

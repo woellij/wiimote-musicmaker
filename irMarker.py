@@ -1,7 +1,8 @@
 import math
-from PyQt5.QtCore import QObject
+
 from PyQt5 import QtGui, QtCore
-from src.wiimotePointer import *
+
+from wiimotePointer import *
 
 
 class IrMarkerEventFilter(QObject):
@@ -29,7 +30,7 @@ class IrMarkerEventFilter(QObject):
         if t == QtGui.QKeyEvent.MouseButtonRelease or t == QtGui.QKeyEvent.MouseButtonPress:
             if ev.modifiers() & QtCore.Qt.ControlModifier:
                 self.addIrMarker(ev.localPos())
-
+                print("IrMarkerEventFilter handling mouse rekease")
                 return True
 
         return False

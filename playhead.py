@@ -6,7 +6,7 @@ from PyQt5.QtCore import *
 class Playhead(QWidget):
     def __init__(self, parent, callback):
         super(Playhead, self).__init__(parent)
-        self.t = self.startTimer(40)
+        self.t = self.startTimer(80)
         self.width = 5
         self.stepping = 50
         self.callback = callback

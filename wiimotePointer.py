@@ -1,23 +1,16 @@
-import sys
 import threading
 import time
 
-import PyQt5
+import numpy as np
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QUndoStack
 from PyQt5.QtWidgets import QWidget
+from oneEuroFilter import *
+from pointer import *
+from wiimotePositionMapper import WiiMotePositionMapper
 
-from src import wiimote
-from src.oneEuroFilter import *
-import time
-import src.wiimote
-
-from src.pointer import *
-import numpy as np
-
-from src.wiimotePositionMapper import WiiMotePositionMapper
+import wiimote
 
 
 def unit_vector(vector):
@@ -94,12 +87,13 @@ class WiiMotePointer(Pointer):
                     angle = np.sum(self.angles)
                     self.angles = []
 
+                    print("sending wheel event")
+
                     targetWidget, localPos = self.__getLocalEventProperties__()
                     wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), abs(angle), Qt.Vertical,
                                           self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
                     ev = PointerWheelEvent(self, angle, wheelEv)
                     self.qapp.postEvent(targetWidget, ev)
-                    self.qapp.sendPostedEvents(self.qapp)
 
         self.latestNormal = currentNormal
 
@@ -153,13 +147,14 @@ class WiiMotePointer(Pointer):
 
         localEvent = QMouseEvent(eventType, localPos, self.point, button, qtButtons, self.qapp.keyboardModifiers())
         localPointerEvent = PointerEvent(self, localEvent)
-        self.qapp.postEvent(self.qapp, localPointerEvent)
+        self.qapp.postEvent(targetWidget, localPointerEvent)
 
     def __onButtonEvent__(self, ev):
         if (len(ev) > 0):
             for wmb in ev:
                 eventType = QEvent.MouseButtonPress if wmb[1] else QEvent.MouseButtonRelease
                 mapped = self.__mapButton__(wmb[0])
+                print(ev)
                 if mapped == Qt.RightButton:
                     self.angles = []
                 self.__sendEvent__(eventType, mapped)

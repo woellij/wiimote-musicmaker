@@ -17,8 +17,10 @@ class WiiMotePositionMapper(object):
         pass
 
     def map(self, data):
+
         if len(data) < 4 or len(data) > 4:
             return None
+
 
         irDots = list(map(lambda d: (d["x"], d["y"]), data))
 
@@ -29,9 +31,6 @@ class WiiMotePositionMapper(object):
                 return None
             res = self.do(*irDots[0], *irDots[1], *irDots[2], *irDots[3], WiiMotePositionMapper.DEST_W, WiiMotePositionMapper.DEST_H )
             #res = self.do(irDots[0][0], irDots[0][1], irDots[1][0], irDots[1][1], irDots[2][0], irDots[2][1], irDofts[3][0], irDots[3][1], )
-            print(res)
-
-
             return res
         except:
             pass

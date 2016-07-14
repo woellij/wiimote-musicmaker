@@ -1,15 +1,11 @@
+from PyQt5 import QtCore, Qt
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QMouseEvent
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QWidget
-from PyQt5 import QtCore, Qt
+from wiimotePointer import *
 
-from PyQt5.QtWidgets import QUndoCommand
-
-from src.app import MusicMakerApp
-from src.wiimotePointer import *
-
-from src.pointerWidget import PointerWidget
+from pointerWidget import PointerWidget
 
 
 class PointerUndoRedoEventFilter(QObject):
@@ -52,7 +48,6 @@ class PointerEventFilter(QObject):
 
         if t == QMouseEvent.MouseMove:
             pos = ev.globalPos()
-            print ("window pos "  + str(pos.x()) + " " + str(pos.y()))
             self.getPointerWidget(event).move(pos)
         return False
 

@@ -1,9 +1,9 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QMouseEvent
+from app import MusicMakerApp
 
-from src.app import MusicMakerApp
-from src.pointer import PointerEvent, PointerWheelEvent
+from pointer import PointerEvent, PointerWheelEvent
 
 
 class WheelOperation(object):

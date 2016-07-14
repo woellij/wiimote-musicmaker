@@ -3,14 +3,16 @@
 
 from PyQt5.QtWidgets import QWidget
 
-from src.capturePointerDownWheelFilter import PointerDownCaptureWheelFilter
-from src.dragEventFilter import DragEventFilter
-from src.drawWidget import PointerDrawEventFilter
-from src.pointerEventFilter import *
-from src.wiimotePointer import *
-from src.remapMouseEventFilter import *
+from capturePointerDownWheelFilter import PointerDownCaptureWheelFilter
+from dragEventFilter import DragEventFilter
+from drawWidget import PointerDrawEventFilter
+from pointerEventFilter import *
+from wiimotePointer import *
+from remapMouseEventFilter import *
 
-from src.app import MusicMakerApp
+import sys
+
+from app import MusicMakerApp
 from PyQt5 import Qt
 import atexit
 
@@ -32,9 +34,9 @@ class ColorPick(object):
 
     def pick(self):
         self.index += 1
-        self.index = (self.index % len(ColorPick.COLORS)) - 1
-        print(self.index)
-        return ColorPick.COLORS[self.index]
+        index = (self.index % len(ColorPick.COLORS)) - 1
+        print(index)
+        return ColorPick.COLORS[index]
 
 
 class Program(object):
@@ -43,8 +45,10 @@ class Program(object):
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
 
-        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
-        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
+        #self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
+        #qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
+
+
 
         app = MusicMakerApp()  # type: QWidget
         app.showFullScreen()
@@ -58,9 +62,6 @@ class Program(object):
         self.colorPick = ColorPick()
         self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
         qapp.installEventFilter(self.remapMousefilter)
-
-
-
 
         self.pointerFilter = PointerEventFilter(app, qapp)
         qapp.installEventFilter(self.pointerFilter)
@@ -81,6 +82,11 @@ class Program(object):
         pointerFactory = lambda wm: WiiMotePointer(wm, qapp, self.colorPick.pick())
         pointerReceiver = WiiMotePointerReceiver(pointerFactory)
         pointerReceiver.start()
+
+
+        if(len(sys.argv) == 2):
+            mac = sys.argv[1]
+            pointerReceiver.__connect__(mac, "")
 
     def onExit(self):
         if hasattr(self, "s"):

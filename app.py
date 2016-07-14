@@ -1,23 +1,16 @@
 from queue import Queue
 
-from PyQt5.QtWidgets import QDial, QWidget
-from PyQt5 import *
-
-import os.path
-
-from PyQt5.QtWidgets import QLayout
-from PyQt5.QtWidgets import QUndoCommand
-
-from src.drawWidget import QDrawWidget, PointerDrawEventFilter
-from src.recognizer import Recognizer
-from src.playWidget import *
-from src.wiimotePointer import *
-from src.playhead import Playhead
-import src.template as template
-
 import numpy as np
+import  template as template
+from PyQt5.QtWidgets import QUndoCommand
+from PyQt5.QtWidgets import QWidget
+from  irMarker import IrMarkerEventFilter
+from  playWidget import *
+from  playhead import Playhead
+from  wiimotePointer import *
 
-from src.irMarker import IrMarkerEventFilter
+from recognizer import Recognizer
+
 
 class RelayUndoCommand(QUndoCommand):
     def __init__(self, redo, undo):
@@ -89,11 +82,11 @@ class RecThread(QThread):
 class MusicMakerApp(QWidget):
 
     TEMPLATEWIDGETFACTORIES = {
-        "circle": lambda: PlayWidget("../samples/clap.wav", "../samples/cymbal.wav", lambda args: args[0].drawEllipse(*args[1:])),
-        "rectangle": lambda: PlayWidget("../samples/kick.wav","../samples/rs.wav", lambda args: args[0].drawRect(*args[1:])),
-        "caret": lambda: PlayWidget("../samples/hh.wav","../samples/ohh.wav", lambda args: DrawHelper.drawTriangle(*args)),
-        "zig-zag": lambda: PlayWidget("../samples/sd1.wav", "../samples/sd2.wav", lambda args: DrawHelper.drawZig(*args)),
-        "left_square_bracket": lambda: PlayWidget("../samples/cb.wav", "../samples/hc.wav", lambda args: DrawHelper.drawBracket(*args)),
+        "circle": lambda: PlayWidget("samples/clap.wav", "samples/cymbal.wav", lambda args: args[0].drawEllipse(*args[1:])),
+        "rectangle": lambda: PlayWidget("samples/kick.wav","samples/rs.wav", lambda args: args[0].drawRect(*args[1:])),
+        "caret": lambda: PlayWidget("samples/hh.wav","samples/ohh.wav", lambda args: DrawHelper.drawTriangle(*args)),
+        "zig-zag": lambda: PlayWidget("samples/sd1.wav", "samples/sd2.wav", lambda args: DrawHelper.drawZig(*args)),
+        "left_square_bracket": lambda: PlayWidget("samples/cb.wav", "samples/hc.wav", lambda args: DrawHelper.drawBracket(*args)),
     }
 
     def __init__(self):

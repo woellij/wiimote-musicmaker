@@ -1,11 +1,7 @@
-
 from PyQt5 import QtWidgets, QtCore, QtGui
-
 from PyQt5.QtCore import QObject
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QWidget
 
-from src.pointer import PointerEvent
+from pointer import PointerEvent
 
 class PointerDrawEventFilter(QObject):
 

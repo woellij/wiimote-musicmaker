@@ -1,9 +1,9 @@
 from PyQt5 import QtCore, Qt
-
 from PyQt5.QtCore import QObject, QPoint
 from PyQt5.QtWidgets import *
-from src.pointer import *
-from src.playWidget import PlayWidget
+from playWidget import PlayWidget
+
+from pointer import *
 
 
 class SendPointerEventToFirstPlayWidgetFilter(QObject):
@@ -14,8 +14,11 @@ class SendPointerEventToFirstPlayWidgetFilter(QObject):
     def eventFilter(self, obj, event):
         if type(event) is PointerWheelEvent:
             for w in self.qapp.allWidgets():
+                print("child widget " + str(type(w)))
                 if type(w) is PlayWidget:
+                    print("forwarding wheel to first")
                     w.event(event)
+                    return True
 
         return False
 
@@ -46,7 +49,7 @@ class RemapMouseEventFilter(QObject):
                     localPos = target.mapFromGlobal(pos)
                     ev = QMouseEvent(t, localPos, pos, button, self.qapp.mouseButtons(), self.qapp.keyboardModifiers())
                     self.qapp.postEvent(target, PointerEvent(self.mousePointer, ev))
-                return True
+                    return True
 
         if(type(event) is QMouseEvent):
             self.latestMousePos = (event.globalPos().x(), event.globalPos().y()) # type: QMouseEvent
