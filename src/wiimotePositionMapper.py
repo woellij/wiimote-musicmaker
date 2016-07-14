@@ -5,7 +5,7 @@ from scipy.linalg import solve, inv
 
 class WiiMotePositionMapper(object):
     markers = []
-
+    DEST_W, DEST_H = 1366, 768
     # xlim(0, SRC_W)
     # ylim(0, SRC_H)
     # scatter(*zip(*scoords))  # repack points[] to axes[] for plottingd
@@ -24,7 +24,8 @@ class WiiMotePositionMapper(object):
         ms = sort(ms,0,)
         print(ms)
         try:
-            res = self.do(ms[0][0], ms[0][1], ms[1][0], ms[1][1], ms[2][0], ms[2][1], ms[3][0], ms[3][1], 1366, 768 )
+            res = self.do(*ms[0], *ms[1], *ms[2], *ms[3], WiiMotePositionMapper.DEST_W, WiiMotePositionMapper.DEST_H )
+            #res = self.do(ms[0][0], ms[0][1], ms[1][0], ms[1][1], ms[2][0], ms[2][1], ms[3][0], ms[3][1], )
             print(res)
 
 

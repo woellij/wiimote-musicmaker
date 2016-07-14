@@ -22,10 +22,11 @@ class SendPointerEventToFirstPlayWidgetFilter(QObject):
 
 class RemapMouseEventFilter(QObject):
 
-    def __init__(self, qapp):
+    def __init__(self, qapp, colorPick):
         super(RemapMouseEventFilter, self).__init__()
+        self.colorPick = colorPick
         self.qapp= qapp  # type: Qt.QApplication
-        self.mousePointer = Pointer("mouse", QtCore.Qt.green)
+        self.mousePointer = Pointer("mouse", colorPick.pick())
         self.wheelevents = []
 
 

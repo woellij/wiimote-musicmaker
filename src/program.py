@@ -21,6 +21,21 @@ def onExit():
         program.onExit()
 
 
+class ColorPick(object):
+    from PyQt5.QtCore import Qt as qt
+    COLORS = [qt.white, qt.green, qt.yellow, qt.cyan, qt.red, qt.darkYellow, qt.darkCyan, qt.darkGreen]
+
+    def __init__(self):
+        super(ColorPick, self).__init__()
+        self.index = 0
+
+    def pick(self):
+        self.index += 1
+        self.index = (self.index % len(ColorPick.COLORS)) - 1
+        print(self.index)
+        return ColorPick.COLORS[self.index]
+
+
 class Program(object):
     def __init__(self):
         super(Program, self).__init__()
@@ -29,7 +44,8 @@ class Program(object):
         app = MusicMakerApp()  # type: QWidget
         app.show()
 
-        self.remapMousefilter = RemapMouseEventFilter(qapp)
+        self.colorPick = ColorPick()
+        self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
         qapp.installEventFilter(self.remapMousefilter)
 
         self.pointerFilter = PointerEventFilter(app, qapp)
@@ -50,8 +66,7 @@ class Program(object):
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""
 
-        # TODO generate random colors
-        pointerFactory = lambda wm: WiiMotePointer(wm, qapp, Qt.Qt.yellow)
+        pointerFactory = lambda wm: WiiMotePointer(wm, qapp, self.colorPick.pick())
         pointerReceiver = WiiMotePointerReceiver(pointerFactory)
         pointerReceiver.start()
 
@@ -75,6 +90,9 @@ def main():
     WiiMotePositionMapper.markers.append((width, - heightDif))
     WiiMotePositionMapper.markers.append((widthDif, height))
     WiiMotePositionMapper.markers.append((width, height))
+
+    WiiMotePositionMapper.dest_w = screen_resolution.width() + 2 * widthDif
+    WiiMotePositionMapper.dest_h = screen_resolution.height + 2 * heightDif
 
     sys.exit(program.qapp.exec_())
 
