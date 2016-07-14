@@ -6,9 +6,9 @@ from PyQt5.QtCore import *
 class Playhead(QWidget):
     def __init__(self, parent, callback):
         super(Playhead, self).__init__(parent)
-        self.t = self.startTimer(20)
+        self.t = self.startTimer(40)
         self.width = 5
-        self.stepping = 20
+        self.stepping = 50
         self.callback = callback
         self.setAttribute(Qt.WA_TransparentForMouseEvents)
 

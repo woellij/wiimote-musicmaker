@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import QWidget
 
 from src.capturePointerDownWheelFilter import PointerDownCaptureWheelFilter
 from src.dragEventFilter import DragEventFilter
+from src.drawWidget import PointerDrawEventFilter
 from src.pointerEventFilter import *
 from src.wiimotePointer import *
 from src.remapMouseEventFilter import *
@@ -41,12 +42,25 @@ class Program(object):
         super(Program, self).__init__()
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
+
+        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
+        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
+
         app = MusicMakerApp()  # type: QWidget
-        app.show()
+        app.showFullScreen()
+
+        self.pointerDrawFilter = PointerDrawEventFilter(app, None)
+        self.qapp.installEventFilter(self.pointerDrawFilter)
+
+        app.setPointerDrawFilter(self.pointerDrawFilter)
+
 
         self.colorPick = ColorPick()
         self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
         qapp.installEventFilter(self.remapMousefilter)
+
+
+
 
         self.pointerFilter = PointerEventFilter(app, qapp)
         qapp.installEventFilter(self.pointerFilter)
@@ -60,8 +74,6 @@ class Program(object):
         self.wheelFilter = PointerDownCaptureWheelFilter(qapp)
         qapp.installEventFilter(self.wheelFilter)
 
-        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
-        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
 
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""
@@ -91,8 +103,8 @@ def main():
     WiiMotePositionMapper.markers.append((widthDif, height))
     WiiMotePositionMapper.markers.append((width, height))
 
-    WiiMotePositionMapper.dest_w = screen_resolution.width() + 2 * widthDif
-    WiiMotePositionMapper.dest_h = screen_resolution.height() + 2 * heightDif
+    WiiMotePositionMapper.DEST_W = screen_resolution.width() + 2 * widthDif
+    WiiMotePositionMapper.DEST_H = screen_resolution.height() + 2 * heightDif
 
     sys.exit(program.qapp.exec_())
 

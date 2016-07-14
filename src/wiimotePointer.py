@@ -99,6 +99,7 @@ class WiiMotePointer(Pointer):
                                           self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
                     ev = PointerWheelEvent(self, angle, wheelEv)
                     self.qapp.postEvent(targetWidget, ev)
+                    self.qapp.sendPostedEvents(self.qapp)
 
         self.latestNormal = currentNormal
 
@@ -152,7 +153,7 @@ class WiiMotePointer(Pointer):
 
         localEvent = QMouseEvent(eventType, localPos, self.point, button, qtButtons, self.qapp.keyboardModifiers())
         localPointerEvent = PointerEvent(self, localEvent)
-        self.qapp.postEvent(targetWidget, localPointerEvent)
+        self.qapp.postEvent(self.qapp, localPointerEvent)
 
     def __onButtonEvent__(self, ev):
         if (len(ev) > 0):

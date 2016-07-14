@@ -28,7 +28,7 @@ class WiiMotePositionMapper(object):
             if len(irDots) < 4 or len(irDots) > 4:
                 return None
             res = self.do(*irDots[0], *irDots[1], *irDots[2], *irDots[3], WiiMotePositionMapper.DEST_W, WiiMotePositionMapper.DEST_H )
-            #res = self.do(irDots[0][0], irDots[0][1], irDots[1][0], irDots[1][1], irDots[2][0], irDots[2][1], irDots[3][0], irDots[3][1], )
+            #res = self.do(irDots[0][0], irDots[0][1], irDots[1][0], irDots[1][1], irDots[2][0], irDots[2][1], irDofts[3][0], irDots[3][1], )
             print(res)
 
 
@@ -46,9 +46,7 @@ class WiiMotePositionMapper(object):
             withDistance = list(map(lambda p: (p, np.linalg.norm(np.subtract(bottomLeft, p))), xSorted))
 
             distSorted = sorted(withDistance, key=itemgetter(1))
-            result = [bottomLeft, distSorted[1][0], distSorted[2][0], distSorted[0][0]]
-
-            return result
+            return [distSorted[0][0], distSorted[2][0], distSorted[1][0], bottomLeft]
         except:
             return []
 

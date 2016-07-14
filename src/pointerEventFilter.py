@@ -51,7 +51,7 @@ class PointerEventFilter(QObject):
         t = ev.type()
 
         if t == QMouseEvent.MouseMove:
-            pos = ev.windowPos()
+            pos = ev.globalPos()
             print ("window pos "  + str(pos.x()) + " " + str(pos.y()))
             self.getPointerWidget(event).move(pos)
         return False

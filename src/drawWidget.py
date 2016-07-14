@@ -15,6 +15,10 @@ class PointerDrawEventFilter(QObject):
         self.completeCallback = completeCallback
         self.pointerPoints = dict()
 
+    def setCompleteCallback(self, completeCallback):
+        self.completeCallback = completeCallback
+
+
 
     def eventFilter(self, obj, event):
 

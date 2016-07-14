@@ -101,8 +101,6 @@ class MusicMakerApp(QWidget):
         self.setMinimumHeight(500)
         self.setMinimumWidth(800)
 
-        self.pointerDrawFilter = PointerDrawEventFilter(self, self.onPointerDrawComplete)
-        self.installEventFilter(self.pointerDrawFilter)
 
         self.markerHelper = IrMarkerEventFilter(self)
         self.installEventFilter(self.markerHelper)
@@ -121,6 +119,9 @@ class MusicMakerApp(QWidget):
 
         self.head = Playhead(self, self.playheadMoved)
 
+    def setPointerDrawFilter(self, filter):
+        self.pointerDrawFilter = filter
+        self.pointerDrawFilter.setCompleteCallback(self.onPointerDrawComplete)
 
     def playheadMoved(self, xpos, stepping):
         cs = self.children()
@@ -212,8 +213,8 @@ class MusicMakerApp(QWidget):
         return AddCommand(self, widget)
 
     def setupChildWidget(self, widget, points):
-        widget.setFixedWidth(50)
-        widget.setFixedHeight(50)
+        widget.setFixedWidth(100)
+        widget.setFixedHeight(100)
 
         x, y = np.mean(points,0 )
         x = x - widget.width() * 0.5
