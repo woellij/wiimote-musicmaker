@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="12477a28-947b-45a3-9d0e-a4152120180d" name="Default" comment="">
+    <list default="true" id="12477a28-947b-45a3-9d0e-a4152120180d" name="Default" comment="added euclidean distance ir marker sorting">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/wiimotePositionMapper.py" afterPath="$PROJECT_DIR$/src/wiimotePositionMapper.py" />
     </list>
@@ -39,8 +39,8 @@
       <file leaf-file-name="wiimotePositionMapper.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/wiimotePositionMapper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="570">
-              <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+            <state relative-caret-position="240">
+              <caret line="34" column="22" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
               <folding>
                 <element signature="e#0#40#0" expanded="true" />
               </folding>
@@ -536,7 +536,14 @@
       <option name="project" value="LOCAL" />
       <updated>1468481469069</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="added euclidean distance ir marker sorting">
+      <created>1468483239629</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1468483239629</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TodoView">
@@ -714,8 +721,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/wiimotePositionMapper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+        <state relative-caret-position="240">
+          <caret line="34" column="22" selection-start-line="34" selection-start-column="22" selection-end-line="34" selection-end-column="22" />
           <folding>
             <element signature="e#0#40#0" expanded="true" />
           </folding>
