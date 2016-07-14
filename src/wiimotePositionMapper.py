@@ -41,13 +41,16 @@ class WiiMotePositionMapper(object):
         return (0, 0)
 
     def orderIrDots(self, irDots):
-        xSorted = sorted(irDots, key=itemgetter(0))
-        bottomLeft = min(xSorted, axis=1)
+        try:
+            xSorted = sorted(irDots, key=itemgetter(0))
+            bottomLeft = min(xSorted, axis=1)
 
-        withDistance =  map( lambda p: (p, np.linalg.norm(bottomLeft - p)), xSorted[1:])
-        distSorted = np.sort(withDistance, 0)
+            withDistance =  map( lambda p: (p, np.linalg.norm(bottomLeft - p)), xSorted[1:])
+            distSorted = np.sort(withDistance, 0)
 
-        return [bottomLeft, distSorted[1], distSorted[3], distSorted[0]]
+            return [bottomLeft, distSorted[1], distSorted[3], distSorted[0]]
+        except:
+            return []
 
     def filterMarkers(self, irDots):
         return irDots
