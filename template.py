@@ -1,6 +1,3 @@
-import numpy as np
-
-
 class Template(object):
     """A simple class for templates"""
 

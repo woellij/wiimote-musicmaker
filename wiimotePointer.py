@@ -1,45 +1,25 @@
-import threading
-import time
-
-import numpy as np
 from PyQt5.QtCore import *
-from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QWidget
-from oneEuroFilter import *
-from pointer import *
-from wiimotePositionMapper import WiiMotePositionMapper
 
 import wiimote
-
-
-def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
-    return vector / np.linalg.norm(vector)
-
-
-def angle_between(v1, v2):
-    try:
-        v1_u = unit_vector(v1)
-        v2_u = unit_vector(v2)
-        directed = np.arctan2(v2[1], v2[0]) - np.arctan2(v1[1], v1[0])
-        return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0)), directed
-    except:
-        return 0
+from pointer import *
+from turnOperation import TurnOperation
+from wiimotePositionMapper import WiiMotePositionMapper
 
 
 class WiiMotePointer(Pointer):
     BUTTONMAP = {'A': Qt.RightButton,
                  'B': Qt.LeftButton,
-                 'Down': Qt.Key_Down,
                  'Home': Qt.MiddleButton,
-                 'Left': Qt.Key_Left,
                  'Minus': Qt.BackButton,
                  'One': Qt.ExtraButton3,
                  'Plus': Qt.ForwardButton,
-                 'Right': Qt.Key_Right,
                  'Two': Qt.ExtraButton4,
-                 'Up': Qt.Key_Up,
+                 # 'Down': Qt.Key_Down,
+                 # 'Left': Qt.Key_Left,
+                 # 'Right': Qt.Key_Right,
+                 # 'Up': Qt.Key_Up,
                  }
 
     def __init__(self, wiimote, qapp, color):
@@ -48,54 +28,27 @@ class WiiMotePointer(Pointer):
         self.positionMapper = WiiMotePositionMapper()
         self.qapp = qapp  # type: QApplication
         self.point = QPoint(0, 0)
-        self.latestNormal = (0, 0)
+        self.turnOperation = None
 
         self.wm = wiimote  # type: wiimote.WiiMote
         self.wm.buttons.register_callback(self.__onButtonEvent__)
         self.wm.accelerometer.register_callback(self.__onAccelerometerData__)
         self.wm.ir.register_callback(self.__onIrData__)
 
-        config = {
-            'freq': 120,  # Hz
-            'mincutoff': 1,  # FIXME
-            'beta': 0.1,  # FIXME
-            'dcutoff': 1.0  # this one should be ok
-        }
-
-        self.angleFilter = OneEuroFilter(**config)
-        self.angles = []
-
     def __onAccelerometerData__(self, data):
-        dif = 512
-        x, y = data[0] - dif, data[2] - dif
-        currentNormal = np.array([x, 0]) + np.array([0, y])
+        if self.turnOperation:
+            angle = self.turnOperation.getAngle(data)
+            if angle:
+                self.__sendWheelEvent__(angle)
 
-        angle, direction = angle_between(currentNormal, self.latestNormal)
-        angle = angle * (180 / np.pi)
-        angle = angle * -1 if direction < 0 else angle
+    def __sendWheelEvent__(self, angle):
+        targetWidget, localPos = self.__getLocalEventProperties__()
 
-        if not np.isnan(angle):
-            angle = self.angleFilter(angle, time.time())
+        wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), abs(angle), Qt.Vertical,
+                              self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
+        ev = PointerWheelEvent(self, angle, wheelEv)
 
-        for b in self.__mapActiveButtons__():
-            if b == Qt.RightButton:
-                # only sending wiimote wheelevent when right mouse button is pressed (mapped from A)
-                # append values
-                self.angles.append(angle)
-
-                if len(self.angles) > 5:
-                    angle = np.sum(self.angles)
-                    self.angles = []
-
-                    print("sending wheel event")
-
-                    targetWidget, localPos = self.__getLocalEventProperties__()
-                    wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), abs(angle), Qt.Vertical,
-                                          self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
-                    ev = PointerWheelEvent(self, angle, wheelEv)
-                    self.qapp.postEvent(targetWidget, ev)
-
-        self.latestNormal = currentNormal
+        self.qapp.postEvent(targetWidget, ev)
 
     def __onIrData__(self, data):
         p = self.positionMapper.map(data)
@@ -152,73 +105,11 @@ class WiiMotePointer(Pointer):
     def __onButtonEvent__(self, ev):
         if (len(ev) > 0):
             for wmb in ev:
-                eventType = QEvent.MouseButtonPress if wmb[1] else QEvent.MouseButtonRelease
+                pressed = wmb[1]
+                eventType = QEvent.MouseButtonPress if pressed else QEvent.MouseButtonRelease
                 mapped = self.__mapButton__(wmb[0])
-                print(ev)
                 if mapped == Qt.RightButton:
-                    self.angles = []
+                    # set or reset the current turn-operation
+                    self.turnOperation = TurnOperation() if pressed else None
+
                 self.__sendEvent__(eventType, mapped)
-
-
-class WiiMotePointerReceiver(object):
-    def __init__(self, pointerFactory):
-        super(WiiMotePointerReceiver, self).__init__()
-        self.pointerFactory = pointerFactory  # type WiiMotePointerConfig
-        self.connecteds = dict()
-        self.thread = None
-
-    def start(self):
-        self.running = True
-        if (self.thread):
-            # already running
-            return
-        self.thread = threading.Thread(target=self.__run__, args=())
-        self.thread.daemon = True
-        self.thread.start()
-
-    def stop(self):
-        self.running = False
-        self.thread = None
-
-    def dispose(self):
-        for wm in map(lambda pair: pair[1][0], self.connecteds.items()):
-            wm.disconnect()
-
-    def __checkConnected__(self):
-        connected = list(self.connecteds.items())
-        for entry in map(lambda pair: pair, connected):
-            wm = entry[1][0]  # type: wiimote.WiiMote
-            if not wm.connected:
-                # remove to cleanup
-                self.connecteds.pop(wm.btaddr, None)
-                # try reconnect
-                self.__connect__(wm.btaddr, wm.model)
-
-    def __connect__(self, addr, name):
-        try:
-            wm = wiimote.connect(addr, name)
-            pointer = self.pointerFactory(wm)
-            self.connecteds[addr] = (wm, pointer)
-            print("connected to: " + addr)
-        except Exception as e:
-            print("error connecting to : " + addr + " " + str(e))
-            pass
-
-    def __discover__(self):
-        try:
-            pairs = wiimote.find()
-            if (pairs):
-                for addr, name in pairs:
-                    if addr in self.connecteds:
-                        # already connected
-                        continue
-                    self.__connect__(addr, name)
-
-        except:
-            pass
-
-    def __run__(self):
-        while (self.running):
-            time.sleep(1)
-            self.__checkConnected__()
-            self.__discover__()

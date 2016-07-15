@@ -1,20 +1,22 @@
 # !/usr/bin/python
 # -*- coding: utf-8 -*-
 
-from PyQt5.QtWidgets import QWidget
-
-from capturePointerDownWheelFilter import PointerDownCaptureWheelFilter
-from dragEventFilter import DragEventFilter
-from drawWidget import PointerDrawEventFilter
-from pointerEventFilter import *
-from wiimotePointer import *
-from remapMouseEventFilter import *
-
+import atexit
 import sys
 
-from app import MusicMakerApp
 from PyQt5 import Qt
-import atexit
+
+from app import MusicMakerApp
+from capturePointerDownWheelFilter import CapturePointerWheelEventFilter
+from dragEventFilter import DragEventFilter
+from drawWidget import PointerDrawEventFilter
+from forwardPointerWheelEventFilter import SendPointerEventToFirstPlayWidgetFilter
+from pointerEventFilter import PointerEventFilter
+from remapMouseEventFilter import RemapMouseEventFilter
+from undoPointerEventFilter import PointerUndoRedoEventFilter
+from wiimotePointer import WiiMotePointer
+from wiimotePointerReceiver import WiiMotePointerReceiver
+from wiimotePositionMapper import WiiMotePositionMapper
 
 program = None  # type: Program
 
@@ -45,19 +47,16 @@ class Program(object):
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
 
-        #self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
-        #qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
-
-
+        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
+        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
 
         app = MusicMakerApp()  # type: QWidget
-        app.showFullScreen()
+        app.show()
 
         self.pointerDrawFilter = PointerDrawEventFilter(app, None)
         self.qapp.installEventFilter(self.pointerDrawFilter)
 
         app.setPointerDrawFilter(self.pointerDrawFilter)
-
 
         self.colorPick = ColorPick()
         self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
@@ -72,9 +71,8 @@ class Program(object):
         self.undoRedoFilter = PointerUndoRedoEventFilter()
         qapp.installEventFilter(self.undoRedoFilter)
 
-        self.wheelFilter = PointerDownCaptureWheelFilter(qapp)
+        self.wheelFilter = CapturePointerWheelEventFilter(qapp)
         qapp.installEventFilter(self.wheelFilter)
-
 
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""
@@ -83,10 +81,9 @@ class Program(object):
         pointerReceiver = WiiMotePointerReceiver(pointerFactory)
         pointerReceiver.start()
 
-
-        if(len(sys.argv) == 2):
+        if (len(sys.argv) == 2):
             mac = sys.argv[1]
-            pointerReceiver.__connect__(mac, "")
+            pointerReceiver.__connect__(mac, "Nintendo RVL-CNT-01-TR")
 
     def onExit(self):
         if hasattr(self, "s"):

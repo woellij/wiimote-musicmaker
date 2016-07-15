@@ -8,41 +8,10 @@ from PyQt5.QtWidgets import *
 from pointer import PointerWheelEvent
 
 
-class DrawHelper(object):
-    @staticmethod
-    def drawTriangle(qp, x, y, width, height):
-        qp = qp # type: QPainter
-
-        pointsCoord = [[x + width * 0.5,0], [x, height ], [x + width, height]]
-        trianglePolygon = QPolygonF()
-        for i in pointsCoord:
-            trianglePolygon.append(QPointF(i[0], i[1]))
-
-        qp.drawPolygon(trianglePolygon)
-
-    @staticmethod
-    def drawZig(qp, x, y, width, height):
-        qp = qp # type: QPainter
-        pointsCoord = [[x, y + height],[x + width * 0.33, y], [x + width * 0.66, y + height], [x + width, y]]
-        trianglePolygon = QPolygonF()
-        for i in pointsCoord:
-            trianglePolygon.append(QPointF(i[0], i[1]))
-        qp.drawPolygon(trianglePolygon)
-
-    @staticmethod
-    def drawBracket(qp, x,y,width,height):
-        qp = qp # type: QPainter
-        ps = [[x + width, y ],[x, y], [x , y + height], [x + width, y + height]]
-
-        qp.drawLine(ps[0][0], ps[0][1], ps[1][0], ps[1][1])
-        qp.drawLine(ps[1][0], ps[1][1], ps[2][0], ps[2][1])
-        qp.drawLine(ps[2][0], ps[2][1], ps[3][0], ps[3][1])
-
-
 class PlayWidget(QWidget):
     defaultVolume = 0.5
 
-    def __init__(self, filename1, filename2, drawFunc = None):
+    def __init__(self, filename1, filename2, drawFunc=None):
         self.soundNum = 1
         super(PlayWidget, self).__init__()
         self.playStart = time.time()
@@ -57,12 +26,11 @@ class PlayWidget(QWidget):
     def playingChanged(self):
         self.update()
 
-
     def play(self):
-        if(self.sound.isPlaying()):
+        if (self.sound.isPlaying()):
             return
         now = time.time()
-        if(now - self.playStart < 0.5):
+        if (now - self.playStart < 0.5):
             return
 
         self.playStart = now
@@ -85,14 +53,14 @@ class PlayWidget(QWidget):
         QWidget.wheelEvent(self, ev)
         vol = self.sound.volume()
         if type(ev) is QWheelEvent:
-            ev = ev # type:QWheelEvent
+            ev = ev  # type:QWheelEvent
             a = ev.angleDelta()
 
             changeVol = 0.05
             vol = vol + changeVol if a.y() > 0 else vol - changeVol
 
         elif type(ev) is PointerWheelEvent:
-            ev = ev # type:PointerWheelEvent
+            ev = ev  # type:PointerWheelEvent
             dif = ev.pointerAngleDelta * 2
             dif = dif / 180
             dif = vol * dif
@@ -117,11 +85,10 @@ class PlayWidget(QWidget):
         width, height = self.width(), self.height()
         fac = self.sound.volume()
         width, height = width * fac, height * fac
-        self.paintIcon(p, (self.width() -width ) * 0.5, (self.height() -height) * 0.5, width-1, height-1)
+        self.paintIcon(p, (self.width() - width) * 0.5, (self.height() - height) * 0.5, width - 1, height - 1)
         p.end()
 
-    def paintIcon(self, qp, x,y,width, height):
-        if(self.drawFunc):
-            self.drawFunc([qp, x,y,width, height])
+    def paintIcon(self, qp, x, y, width, height):
+        if (self.drawFunc):
+            self.drawFunc([qp, x, y, width, height])
         pass
-

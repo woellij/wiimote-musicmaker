@@ -7,12 +7,13 @@ class PointerEvent(QMouseEvent):
         super(PointerEvent, self).__init__(QMouseEvent)
         self.pointer = pointer
 
-class PointerWheelEvent(QWheelEvent):
 
+class PointerWheelEvent(QWheelEvent):
     def __init__(self, pointer, angle, qwheelevent):
         super(PointerWheelEvent, self).__init__(qwheelevent)
         self.pointer = pointer
         self.pointerAngleDelta = angle
+
 
 class Pointer(object):
     def __init__(self, id, color):
@@ -21,7 +22,7 @@ class Pointer(object):
         self.__undoStack = QUndoStack()
         self.color = color
 
-    def undoStack(self): # type: QUndoStack
+    def undoStack(self):  # type: QUndoStack
         """
 
         :return: QUndoStack
@@ -29,5 +30,5 @@ class Pointer(object):
 
         return self.__undoStack
 
-    def id(self): # type: str
+    def id(self):  # type: str
         return self.__id

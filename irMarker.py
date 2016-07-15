@@ -11,7 +11,7 @@ class IrMarkerEventFilter(QObject):
     def __init__(self, widget):
         super(IrMarkerEventFilter, self).__init__()
         self.markers = WiiMotePositionMapper.markers
-        self.widget = widget # type: QWidget
+        self.widget = widget  # type: QWidget
         self.widget.setCursor(QCursor(QtCore.Qt.BlankCursor))
         self.markerMode = False
 
@@ -41,7 +41,6 @@ class IrMarkerEventFilter(QObject):
             if not type(p) is QPoint:
                 p = QPoint(*p)
             qp.drawEllipse(p, 10, 10)
-
 
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == IrMarkerEventFilter.markModifierKey:

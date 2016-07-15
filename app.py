@@ -1,15 +1,12 @@
 from queue import Queue
 
-import numpy as np
-import  template as template
-from PyQt5.QtWidgets import QUndoCommand
-from PyQt5.QtWidgets import QWidget
+import template as template
+from drawHelper import DrawHelper
 from  irMarker import IrMarkerEventFilter
 from  playWidget import *
 from  playhead import Playhead
-from  wiimotePointer import *
-
 from recognizer import Recognizer
+from  wiimotePointer import *
 
 
 class RelayUndoCommand(QUndoCommand):
@@ -25,21 +22,20 @@ class RelayUndoCommand(QUndoCommand):
 
 
 class DeleteCommand(QUndoCommand):
-
-    def __init__(self, parent, widget, inverted = False):
+    def __init__(self, parent, widget, inverted=False):
         super(DeleteCommand, self).__init__()
-        self.widget = widget # type: QWidget
+        self.widget = widget  # type: QWidget
         self.parent = parent
         self.inverted = inverted
 
     def undo(self):
-        if(self.inverted):
+        if (self.inverted):
             self._hide()
             return
         self._show()
 
     def redo(self):
-        if(self.inverted):
+        if (self.inverted):
             self._show()
             return
         self._hide()
@@ -52,17 +48,20 @@ class DeleteCommand(QUndoCommand):
         self.widget.setParent(self.parent)
         self.widget.show()
 
+
 class AddCommand(DeleteCommand):
     def __init__(self, parent, widget, inverted=False):
         super(AddCommand, self).__init__(parent, widget, True)
 
-class RecognizeContext(object):
 
+class RecognizeContext(object):
     def __init__(self, recognizer, points, pointer):
         self.recognizer, self.points, self.pointer = recognizer, points, pointer
 
+
 class RecThread(QThread):
     finished = pyqtSignal(object)
+
     def __init__(self):
         super(RecThread, self).__init__()
         self.queue = Queue()
@@ -71,8 +70,8 @@ class RecThread(QThread):
         self.queue.put(context)
 
     def run(self):
-        while(True):
-            context = self.queue.get() # type: RecognizeContext
+        while (True):
+            context = self.queue.get()  # type: RecognizeContext
             if context:
                 res = context.recognizer.recognize(context.points)
                 context.res = res
@@ -80,20 +79,20 @@ class RecThread(QThread):
 
 
 class MusicMakerApp(QWidget):
-
     TEMPLATEWIDGETFACTORIES = {
-        "circle": lambda: PlayWidget("samples/clap.wav", "samples/cymbal.wav", lambda args: args[0].drawEllipse(*args[1:])),
-        "rectangle": lambda: PlayWidget("samples/kick.wav","samples/rs.wav", lambda args: args[0].drawRect(*args[1:])),
-        "caret": lambda: PlayWidget("samples/hh.wav","samples/ohh.wav", lambda args: DrawHelper.drawTriangle(*args)),
+        "circle": lambda: PlayWidget("samples/clap.wav", "samples/cymbal.wav",
+                                     lambda args: args[0].drawEllipse(*args[1:])),
+        "rectangle": lambda: PlayWidget("samples/kick.wav", "samples/rs.wav", lambda args: args[0].drawRect(*args[1:])),
+        "caret": lambda: PlayWidget("samples/hh.wav", "samples/ohh.wav", lambda args: DrawHelper.drawTriangle(*args)),
         "zig-zag": lambda: PlayWidget("samples/sd1.wav", "samples/sd2.wav", lambda args: DrawHelper.drawZig(*args)),
-        "left_square_bracket": lambda: PlayWidget("samples/cb.wav", "samples/hc.wav", lambda args: DrawHelper.drawBracket(*args)),
+        "left_square_bracket": lambda: PlayWidget("samples/cb.wav", "samples/hc.wav",
+                                                  lambda args: DrawHelper.drawBracket(*args)),
     }
 
     def __init__(self):
         super(MusicMakerApp, self).__init__()
         self.setMinimumHeight(500)
         self.setMinimumWidth(800)
-
 
         self.markerHelper = IrMarkerEventFilter(self)
         self.installEventFilter(self.markerHelper)
@@ -121,8 +120,8 @@ class MusicMakerApp(QWidget):
         lower = xpos - stepping
         p = cs[0].pos().x()
         for c in cs:
-            c = c # type: QWidget
-            r = c.geometry() # type: QRect
+            c = c  # type: QWidget
+            r = c.geometry()  # type: QRect
             if c.isVisible() and (lower < r.x() < xpos) or (lower < r.right() < xpos):
                 if hasattr(c, "play"):
                     c.play()
@@ -159,7 +158,6 @@ class MusicMakerApp(QWidget):
         points = list(map(lambda p: (p.x(), p.y()), points))
         self.recognizeThread.recognize(RecognizeContext(self.recognizer, points, pointer))
 
-
     def paintEvent(self, ev):
         QWidget.paintEvent(self, ev)
 
@@ -186,18 +184,17 @@ class MusicMakerApp(QWidget):
             pos += stepping
             qp.drawLine(pos, 0, pos, self.height())
 
-
     def resolveCommand(self, templateName, points):
 
         if templateName == "delete":
             x, y = np.mean(points, 0)
-            widget = self.childAt(x,y)
+            widget = self.childAt(x, y)
             if widget and not widget is self:
                 return DeleteCommand(self, widget)
 
         widgetFactory = MusicMakerApp.TEMPLATEWIDGETFACTORIES.get(templateName, None)
 
-        if(not widgetFactory):
+        if (not widgetFactory):
             return None
 
         widget = widgetFactory()
@@ -209,7 +206,7 @@ class MusicMakerApp(QWidget):
         widget.setFixedWidth(100)
         widget.setFixedHeight(100)
 
-        x, y = np.mean(points,0 )
+        x, y = np.mean(points, 0)
         x = x - widget.width() * 0.5
         y = y - widget.height() * 0.5
         widget.move(x, y)

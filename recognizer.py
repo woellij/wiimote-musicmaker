@@ -7,12 +7,10 @@
 # Objective of import: according to http://codecapsule.com/2012/01/18/how-to-implement-a-paper/ :
 
 
+from itertools import zip_longest as izip
+
 import numpy as np
 import numpy.linalg as linalg
-from itertools import zip_longest as izip
-from template import Template
-
-from multiprocessing import Pool, Process
 
 phi = 0.5 * (-1 + np.sqrt(5))
 numPoints = 255
@@ -161,7 +159,7 @@ def pathDistance(path1, path2):
 
 
 def getDistance(point1, point2):
-    if(point1 is None or point2 is None):
+    if (point1 is None or point2 is None):
         return 0
     return linalg.norm(np.array(point2) - np.array(point1))
 

@@ -1,39 +1,15 @@
-from PyQt5 import QtCore, Qt
-from PyQt5.QtCore import QObject
-from PyQt5.QtGui import QMouseEvent
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtWidgets import QWidget
-from wiimotePointer import *
+from PyQt5 import Qt
 
 from pointerWidget import PointerWidget
-
-
-class PointerUndoRedoEventFilter(QObject):
-
-    def eventFilter(self, obj, event):
-        if not type(event) is PointerEvent:
-            return False
-
-        if event.type() == QMouseEvent.MouseButtonRelease:
-            pointer = event.pointer # type: Pointer
-            if event.button() & QtCore.Qt.BackButton:
-                if(pointer.undoStack().canUndo()):
-                    pointer.undoStack().undo()
-                    return True
-            if event.button() & QtCore.Qt.ForwardButton:
-                if(pointer.undoStack().canRedo()):
-                    pointer.undoStack().redo()
-                    return True
-
-        return False
+from wiimotePointer import *
 
 
 class PointerEventFilter(QObject):
     def __init__(self, widget, qapp):
         super(PointerEventFilter, self).__init__()
 
-        self.qapp = qapp # type: Qt.QApplication
-        self.widget = widget # type: QWidget
+        self.qapp = qapp  # type: Qt.QApplication
+        self.widget = widget  # type: QWidget
         self.__pointers = dict()
 
     def pointers(self):
@@ -43,7 +19,7 @@ class PointerEventFilter(QObject):
         if not type(event) is PointerEvent:
             return False
 
-        ev = event # type: PointerEvent
+        ev = event  # type: PointerEvent
         t = ev.type()
 
         if t == QMouseEvent.MouseMove:

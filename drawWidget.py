@@ -3,8 +3,8 @@ from PyQt5.QtCore import QObject
 
 from pointer import PointerEvent
 
-class PointerDrawEventFilter(QObject):
 
+class PointerDrawEventFilter(QObject):
     def __init__(self, widget, completeCallback):
         super(PointerDrawEventFilter, self).__init__()
         self.widget = widget
@@ -13,8 +13,6 @@ class PointerDrawEventFilter(QObject):
 
     def setCompleteCallback(self, completeCallback):
         self.completeCallback = completeCallback
-
-
 
     def eventFilter(self, obj, event):
 
@@ -68,15 +66,14 @@ class PointerDrawEventFilter(QObject):
 
 
 class QDrawWidget(QtWidgets.QWidget):
-
     def __init__(self, onCompleteCallback):
         super(QDrawWidget, self).__init__()
         self.onCompleteCallback = onCompleteCallback
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.drawing = False
         self.points = []
-        #QtGui.QCursor.setPos(self.mapToGlobal(QtCore.QPoint(*self.start_pos)))
-        self.setMouseTracking(True) # only get events when button is pressed
+        # QtGui.QCursor.setPos(self.mapToGlobal(QtCore.QPoint(*self.start_pos)))
+        self.setMouseTracking(True)  # only get events when button is pressed
         self.initUI()
 
     def initUI(self):
@@ -99,8 +96,6 @@ class QDrawWidget(QtWidgets.QWidget):
             self.update()
             self.onCompleteCallback(self.points)
 
-
-
     def poly(self, pts):
         return QtGui.QPolygonF(map(lambda p: QtCore.QPointF(*p), pts))
 
@@ -119,6 +114,6 @@ class QDrawWidget(QtWidgets.QWidget):
         qp.setPen(QtGui.QColor(0, 155, 0))
         qp.drawPolyline(self.poly(self.points))
         for point in self.points:
-            qp.drawEllipse(point[0]-1, point[1] - 1, 2, 2)
+            qp.drawEllipse(point[0] - 1, point[1] - 1, 2, 2)
 
         qp.end()

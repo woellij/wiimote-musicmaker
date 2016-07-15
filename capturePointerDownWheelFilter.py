@@ -1,8 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import QMouseEvent
-from app import MusicMakerApp
 
+from app import MusicMakerApp
 from pointer import PointerEvent, PointerWheelEvent
 
 
@@ -11,15 +11,13 @@ class WheelOperation(object):
         super(WheelOperation, self).__init__()
         self.changed = False
 
-
     def apply(self, event):
         print(event)
 
 
-class PointerDownCaptureWheelFilter(QObject):
-
+class CapturePointerWheelEventFilter(QObject):
     def __init__(self, qapp):
-        super(PointerDownCaptureWheelFilter, self).__init__()
+        super(CapturePointerWheelEventFilter, self).__init__()
         self.qapp = qapp
         self.operations = dict()
 
@@ -55,6 +53,6 @@ class PointerDownCaptureWheelFilter(QObject):
             operation = self.operations.get(event.pointer, None)
             if operation:
                 operation.apply(event)
-                return False  # not handled so the pointer can update aswell. handing button down already prevents the widget itself from handling
+                return False  # not handled so the pointer can update aswell. handling button down already prevents the widget itself from moving
 
         return False
