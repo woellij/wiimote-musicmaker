@@ -39,7 +39,11 @@ class IrMarkerEventFilter(QObject):
         for p in self.markers:
             qp.setBrush(Qt.red)
             if not type(p) is QPoint:
-                p = QPoint(*p)
+                if type(p) is tuple:
+                    p = QPoint(*p)
+                else:
+                    p  = QPoint(p.x(), p.y())
+
             qp.drawEllipse(p, 10, 10)
 
     def keyPressEvent(self, QKeyEvent):
@@ -50,7 +54,7 @@ class IrMarkerEventFilter(QObject):
 
     def addIrMarker(self, pos):
         if (len(self.markers) >= 4):
-            distanceFunc = lambda p: math.hypot(p.x() - pos.x(), p.y() - pos.y())
+            distanceFunc = lambda p: math.hypot(p[0] - pos.x(), p[1] - pos.y())
             distances = map(lambda p: (p, distanceFunc(p)), self.markers)
             toRemove = min(distances, key=lambda tuple: tuple[1])
             self.markers.remove(toRemove[0])

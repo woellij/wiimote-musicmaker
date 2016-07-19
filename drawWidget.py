@@ -19,9 +19,7 @@ class PointerDrawEventFilter(QObject):
         if not type(event) is PointerEvent:
             return False
         t = event.type()
-        """if t == QtGui.QKeyEvent.MouseButtonPress and event.button() & QtCore.Qt.LeftButton:
-            return self.mousePressEvent(event)
-        el """
+
         if t == QtGui.QKeyEvent.MouseButtonRelease and event.button() & QtCore.Qt.LeftButton:
             return self.mouseReleaseEvent(event)
         elif t == QtGui.QMouseEvent.MouseMove and event.buttons() & QtCore.Qt.LeftButton:

@@ -23,6 +23,8 @@ class PointerWidget(QWidget):
         qp.end()
 
     def move(self, pos):
+        # make new pos to center
         pos = QPoint(pos.x() - self.width() * 0.5, pos.y() - self.height() * 0.5)
+        # make this always on top
         self.raise_()
         QWidget.move(self, pos)

@@ -46,27 +46,28 @@ class Program(object):
         super(Program, self).__init__()
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
-
-        self.sendPointerEventToFirstPlayWidgetFilter = SendPointerEventToFirstPlayWidgetFilter(qapp)
-        qapp.installEventFilter(self.sendPointerEventToFirstPlayWidgetFilter)
-
         app = MusicMakerApp()  # type: QWidget
         app.show()
-
-        self.pointerDrawFilter = PointerDrawEventFilter(app, None)
-        self.qapp.installEventFilter(self.pointerDrawFilter)
-
-        app.setPointerDrawFilter(self.pointerDrawFilter)
+        app.setMouseTracking(True)
 
         self.colorPick = ColorPick()
         self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
         qapp.installEventFilter(self.remapMousefilter)
 
-        self.pointerFilter = PointerEventFilter(app, qapp)
-        qapp.installEventFilter(self.pointerFilter)
+        self.forwardPointerWheelEventToFirstWidget = SendPointerEventToFirstPlayWidgetFilter(qapp)
+        qapp.installEventFilter(self.forwardPointerWheelEventToFirstWidget)
+
+
+
+        self.pointerDrawFilter = PointerDrawEventFilter(app, None)
+        qapp.installEventFilter(self.pointerDrawFilter)
+        app.setPointerDrawFilter(self.pointerDrawFilter)
 
         self.dragFilter = DragEventFilter(qapp)
         qapp.installEventFilter(self.dragFilter)
+
+        self.pointerFilter = PointerEventFilter(app, qapp)
+        qapp.installEventFilter(self.pointerFilter)
 
         self.undoRedoFilter = PointerUndoRedoEventFilter()
         qapp.installEventFilter(self.undoRedoFilter)
@@ -83,13 +84,10 @@ class Program(object):
 
         if (len(sys.argv) == 2):
             mac = sys.argv[1]
-            pointerReceiver.__connect__(mac, "Nintendo RVL-CNT-01-TR")
+            # pointerReceiver.__connect__(mac, "Nintendo RVL-CNT-01-TR")
 
     def onExit(self):
-        if hasattr(self, "s"):
-            self.s.stop()
-            self.s.shutdown()
-        if hasattr(self, "pointerReceiver"):
+        if hasattr(self, "pointerReceiver") and self.pointerReceiver:
             self.pointerReceiver.dispose()
 
 

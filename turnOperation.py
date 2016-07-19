@@ -5,8 +5,12 @@ import numpy as np
 from oneEuroFilter import OneEuroFilter
 
 
+"""
+Based on Sourcecode found on http://stackoverflow.com/questions/2827393/angles-between-two-n-dimensional-vectors-in-python
+'Angles between two n-dimensional vectors in Python'
+"""
+
 def unit_vector(vector):
-    """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
 
 

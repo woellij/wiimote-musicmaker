@@ -13,6 +13,7 @@ class RemapMouseEventFilter(QObject):
         self.wheelevents = []
 
     def eventFilter(self, obj, event):
+
         if (type(event) is QKeyEvent):
             key = event.key()
             button = None
@@ -31,7 +32,13 @@ class RemapMouseEventFilter(QObject):
                     return True
 
         if (type(event) is QMouseEvent):
-            self.latestMousePos = (event.globalPos().x(), event.globalPos().y())  # type: QMouseEvent
+            ev = event # type: QMouseEvent
+            self.latestMousePos = (event.globalPos().x(), event.globalPos().y())
+            """ print("mouse move: %1 ",
+                  ev.localPos(),
+                  ev.windowPos(),
+                  ev.screenPos(),
+                  ev.globalPos())"""
             self.qapp.postEvent(obj, PointerEvent(self.mousePointer, event))
             return True
 

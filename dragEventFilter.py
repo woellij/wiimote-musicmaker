@@ -44,6 +44,6 @@ class DragEventFilter(QObject):
             operation = self.dragOperations.get(event.pointer, None)
             if operation:
                 operation.apply(event)
-                return False  # not handled so the pointer can update aswell. handing button down already prevents the widget itself from handling
+                return True  # not handled so the pointer can update aswell. handing button down already prevents the widget itself from handling
 
         return False

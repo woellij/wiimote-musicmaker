@@ -20,6 +20,7 @@ class PlayWidget(QWidget):
         self.sound = QSoundEffect()
         self.drawFunc = drawFunc
         self.setSource(1)
+        self.setMouseTracking(False)
         self.sound.playingChanged.connect(self.playingChanged)
         self.sound.setVolume(PlayWidget.defaultVolume)
 
