@@ -21,6 +21,10 @@ class RemapMouseEventFilter(QObject):
                 button = QtCore.Qt.ExtraButton3
             if key == QtCore.Qt.Key_2:
                 button = QtCore.Qt.ExtraButton4
+            if key == QtCore.Qt.Key_Backspace:
+                button = QtCore.Qt.BackButton
+            if key == QtCore.Qt.Key_Insert:
+                button = QtCore.Qt.ForwardButton
             if button:
                 t = QMouseEvent.MouseButtonRelease if event.type() == QKeyEvent.KeyRelease else QMouseEvent.MouseButtonPress
                 pos = QPoint(self.latestMousePos[0], self.latestMousePos[1])
