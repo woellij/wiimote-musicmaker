@@ -59,11 +59,11 @@ class RecognizeContext(object):
         self.recognizer, self.points, self.pointer = recognizer, points, pointer
 
 
-class RecThread(QThread):
+class RecognizeThread(QThread):
     finished = pyqtSignal(object)
 
     def __init__(self):
-        super(RecThread, self).__init__()
+        super(RecognizeThread, self).__init__()
         self.queue = Queue()
 
     def recognize(self, context):
@@ -105,7 +105,7 @@ class MusicMakerApp(QWidget):
         self.recognizer.addTemplate(template.Template(*template.zig_zag))
         self.recognizer.addTemplate(template.Template(*template.left_square_bracket))
 
-        self.recognizeThread = RecThread()
+        self.recognizeThread = RecognizeThread()
         self.recognizeThread.finished.connect(self.recognized)
         self.recognizeThread.start()
 
@@ -167,10 +167,10 @@ class MusicMakerApp(QWidget):
         qp.setBrush(Qt.black)
         qp.drawRect(self.rect())
 
+        self.drawStepping(qp, self.head.stepping)
         if self.markerHelper.markerMode:
             self.markerHelper.drawMarkers(qp)
         self.pointerDrawFilter.drawPoints(qp)
-        self.drawStepping(qp, self.head.stepping)
 
         qp.end()
 

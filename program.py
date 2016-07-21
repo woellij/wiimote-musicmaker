@@ -5,11 +5,12 @@ import atexit
 import sys
 
 from PyQt5 import Qt
+from PyQt5.QtCore import QPoint
 
 from app import MusicMakerApp
 from capturePointerDownWheelFilter import CapturePointerWheelEventFilter
 from dragEventFilter import DragEventFilter
-from drawWidget import PointerDrawEventFilter
+from pointerDrawEventFilter import PointerDrawEventFilter
 from forwardPointerWheelEventFilter import SendPointerEventToFirstPlayWidgetFilter
 from pointerEventFilter import PointerEventFilter
 from remapMouseEventFilter import RemapMouseEventFilter

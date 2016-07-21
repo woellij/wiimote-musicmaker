@@ -13,9 +13,6 @@ class WiiMotePositionMapper(object):
     # scatter(*zip(*scoords))  # repack points[] to axes[] for plottingd
     # scatter([SRC_W / 2], [SRC_H / 2], c='r', marker='+')
 
-    def __init__(self):
-        pass
-
     def map(self, data):
 
         if len(data) < 4 or len(data) > 4:
@@ -31,6 +28,8 @@ class WiiMotePositionMapper(object):
             res = self.do(*irDots[0], *irDots[1], *irDots[2], *irDots[3], WiiMotePositionMapper.DEST_W,
                           WiiMotePositionMapper.DEST_H)
             # res = self.do(irDots[0][0], irDots[0][1], irDots[1][0], irDots[1][1], irDots[2][0], irDots[2][1], irDofts[3][0], irDots[3][1], )
+
+
             return res
         except:
             pass

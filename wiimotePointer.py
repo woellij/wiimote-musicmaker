@@ -56,7 +56,7 @@ class WiiMotePointer(Pointer):
             return
         x, y = p[0], p[1]
 
-        point = QPoint(x, y)
+        point = QPoint(x, y) - self.qapp.topLevelWidgets()[0].mapToGlobal(QPoint(0, 0))
         changed = not self.point == point
         self.point = QPoint(x, y)
         if (changed):
