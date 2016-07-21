@@ -6,7 +6,7 @@ from scipy.linalg import solve, inv
 
 class WiiMotePositionMapper(object):
     markers = []
-    DEST_W, DEST_H = 1366, 768
+    DEST_W, DEST_H = 1024, 768
 
     # xlim(0, SRC_W)
     # ylim(0, SRC_H)
@@ -39,12 +39,12 @@ class WiiMotePositionMapper(object):
     def orderIrDots(self, irDots):
         try:
             xSorted = list(sorted(irDots, key=itemgetter(0)))
-            bottomLeft = min(irDots, key=itemgetter(1))
+            bottomLeft = min(xSorted[:2], key=itemgetter(1))
             xSorted.remove(bottomLeft)
-
             withDistance = list(map(lambda p: (p, np.linalg.norm(np.subtract(bottomLeft, p))), xSorted))
-
             distSorted = sorted(withDistance, key=itemgetter(1))
+            print(distSorted)
+
             return [distSorted[0][0], distSorted[2][0], distSorted[1][0], bottomLeft]
         except:
             return []

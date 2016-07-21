@@ -47,7 +47,7 @@ class Program(object):
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
         app = MusicMakerApp()  # type: QWidget
-        app.show()
+        app.showFullScreen()
         app.setMouseTracking(True)
 
         self.colorPick = ColorPick()
@@ -96,6 +96,7 @@ def main():
     program = Program()
 
     screen_resolution = program.qapp.desktop().screenGeometry()
+    print(screen_resolution)
     width, height = screen_resolution.width(), screen_resolution.height()
     widthDif, heightDif = 0, 0
     width, height = width - widthDif, height - heightDif
