@@ -18,6 +18,7 @@ class DragEventFilter(QObject):
         if not type(event) is PointerEvent:
             return False
 
+
         event = event  # type: PointerEvent
         pos = event.globalPos()
 
