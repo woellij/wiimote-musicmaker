@@ -22,10 +22,11 @@ class DragEventFilter(QObject):
         event = event  # type: PointerEvent
         pos = event.globalPos()
 
-        if event.button() == QtCore.Qt.LeftButton:
+        if event.button() & QtCore.Qt.LeftButton:
             if event.type() == QMouseEvent.MouseButtonPress:
 
-                widget = self.qapp.widgetAt(pos.x(), pos.y())
+                widget = event.target # self.qapp.widgetAt(pos.x(), pos.y())
+                print("drag filter target", widget)
                 if (not widget or widget is self.qapp or type(widget) == MusicMakerApp):
                     return False
 
@@ -45,6 +46,6 @@ class DragEventFilter(QObject):
             operation = self.dragOperations.get(event.pointer, None)
             if operation:
                 operation.apply(event)
-                return True  # not handled so the pointer can update aswell. handing button down already prevents the widget itself from handling
+                return True
 
         return False

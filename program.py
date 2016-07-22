@@ -47,7 +47,7 @@ class Program(object):
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
         app = MusicMakerApp()  # type: QWidget
-        app.show()
+        app.showFullScreen()
         app.setMouseTracking(True)
 
         self.colorPick = ColorPick()
@@ -64,11 +64,12 @@ class Program(object):
         self.pointerFilter = PointerEventFilter(app, qapp)
         qapp.installEventFilter(self.pointerFilter)
 
+        self.wheelFilter = CapturePointerWheelEventFilter(qapp)
+        qapp.installEventFilter(self.wheelFilter)
+
         self.undoRedoFilter = PointerUndoRedoEventFilter()
         qapp.installEventFilter(self.undoRedoFilter)
 
-        self.wheelFilter = CapturePointerWheelEventFilter(qapp)
-        qapp.installEventFilter(self.wheelFilter)
 
         """self.s = Server(sr=48000, nchnls=2, buffersize=512, duplex=0).boot()
         self.s.start()"""

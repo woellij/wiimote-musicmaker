@@ -1,13 +1,15 @@
-from PyQt5.QtCore import QEvent
+
+from PyQt5.QtCore import QEvent, QPoint
 from PyQt5.QtCore import QObject
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QUndoStack
 
 
 class PointerEvent(QMouseEvent):
-    def __init__(self, pointer, QMouseEvent):
+    def __init__(self, pointer, QMouseEvent, target):
         super(PointerEvent, self).__init__(QMouseEvent)
         self.pointer = pointer
+        self.target = target
 
 
 class PointerWheelEvent(QEvent):
@@ -24,6 +26,7 @@ class Pointer(object):
         self.__id = id
         self.__undoStack = QUndoStack()
         self.color = color
+        self.pos = QPoint(0,0)
 
     def undoStack(self):  # type: QUndoStack
         """

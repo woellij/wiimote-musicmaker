@@ -1,5 +1,7 @@
+from PyQt5.QtCore import QPoint
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import QObject
+from PyQt5.QtWidgets import QApplication
 
 from pointer import PointerEvent
 
@@ -30,8 +32,8 @@ class PointerDrawEventFilter(QObject):
         points = self.pointerPoints.get(ev.pointer, None)
         if not points:
             self.pointerPoints[ev.pointer] = points = []
-        points.append(ev.pos())
-        return True
+        points.append(ev.pointer.pos)
+        return False
 
     def clearPointsFromPointer(self, pointer):
         try:
@@ -45,7 +47,7 @@ class PointerDrawEventFilter(QObject):
             self.widget.update()
             self.completeCallback(ev.pointer, self.pointerPoints.get(ev.pointer, []))
             self.clearPointsFromPointer(ev.pointer)
-            return True
+            return False
         return False
 
     def poly(self, pts):

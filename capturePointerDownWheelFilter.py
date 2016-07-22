@@ -25,22 +25,23 @@ class CapturePointerWheelEventFilter(QObject):
     def eventFilter(self, obj, event):
         if type(event) is PointerEvent:
             event = event  # type: PointerEvent
-            pos = event.globalPos()
+            pos = event.pointer.pos
 
-            if event.button() == QtCore.Qt.RightButton:
+            if event.button() & QtCore.Qt.RightButton:
                 if event.type() == QMouseEvent.MouseButtonPress:
 
-                    widget = self.qapp.widgetAt(pos.x(), pos.y())
+                    print("start capture")
+                    widget = event.target
                     if (not widget or widget is self.qapp or type(widget) == MusicMakerApp):
                         return False
 
                     self.operations[event.pointer] = VolumeOperation(widget)
                     return True
                 if event.type() == QMouseEvent.MouseButtonRelease:
+                    print("capture done")
                     operation = self.operations.get(event.pointer, None)
                     if operation:
                         self.operations.pop(event.pointer)
-                        print("capture done")
                         return True
 
             elif event.type() == QMouseEvent.MouseMove:

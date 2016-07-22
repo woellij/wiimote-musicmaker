@@ -64,10 +64,11 @@ class WiiMotePointer(Pointer):
         if not p:
             return
         x, y = self.pointFilters["x"](p[0]), self.pointFilters["y"](p[1])
-
         point = QPoint(x, y)
         changed = not self.point == point
         self.point = point
+        self.pos = self.point - self.qapp.topLevelWidgets()[0].mapToGlobal(QPoint(0, 0))
+        print("wiimotepointer", self.pos, self.point)
         if (changed):
             self.__sendEvent__(QEvent.MouseMove)
 
@@ -108,7 +109,7 @@ class WiiMotePointer(Pointer):
         targetWidget, localPos = self.__getLocalEventProperties__()
 
         localEvent = QMouseEvent(eventType, localPos, self.point, button, qtButtons, self.qapp.keyboardModifiers())
-        localPointerEvent = PointerEvent(self, localEvent)
+        localPointerEvent = PointerEvent(self, localEvent, targetWidget)
         self.qapp.postEvent(targetWidget, localPointerEvent)
 
     def __onButtonEvent__(self, ev):

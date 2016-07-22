@@ -24,9 +24,7 @@ class PointerEventFilter(QObject):
         t = ev.type()
 
         if t == QMouseEvent.MouseMove:
-            pos = ev.globalPos()
-            widgetPos = pos - self.qapp.topLevelWidgets()[0].mapToGlobal(QPoint(0, 0))
-            self.getPointerWidget(event).move(widgetPos)
+            self.getPointerWidget(event).move(ev.pointer.pos)
         return False
 
 
