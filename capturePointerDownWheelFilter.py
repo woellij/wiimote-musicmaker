@@ -6,6 +6,15 @@ from PyQt5.QtWidgets import QUndoCommand
 from app import MusicMakerApp
 from pointer import PointerEvent, PointerWheelEvent
 
+class VolumeOperation(object):
+
+    def __init__(self, widget):
+        super(VolumeOperation, self).__init__()
+        self.widget = widget
+
+    def apply(self, event):
+        self.widget.adjustVolume(event.pointerAngleDelta * 8)
+        return True
 
 class CapturePointerWheelEventFilter(QObject):
     def __init__(self, qapp):
@@ -25,12 +34,13 @@ class CapturePointerWheelEventFilter(QObject):
                     if (not widget or widget is self.qapp or type(widget) == MusicMakerApp):
                         return False
 
-                    self.operations[event.pointer] = True
+                    self.operations[event.pointer] = VolumeOperation(widget)
                     return True
                 if event.type() == QMouseEvent.MouseButtonRelease:
                     operation = self.operations.get(event.pointer, None)
                     if operation:
                         self.operations.pop(event.pointer)
+                        print("capture done")
                         return True
 
             elif event.type() == QMouseEvent.MouseMove:
@@ -42,6 +52,7 @@ class CapturePointerWheelEventFilter(QObject):
         elif type(event) is PointerWheelEvent:
             operation = self.operations.get(event.pointer, None)
             if operation:
-                return False  # not handled so the pointer can update aswell. handling button down already prevents the widget itself from moving
+                operation.apply(event)
+                return  True
 
         return False

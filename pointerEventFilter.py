@@ -1,5 +1,6 @@
 from PyQt5 import Qt
 
+from oneEuroFilter import OneEuroFilter
 from pointerWidget import PointerWidget
 from wiimotePointer import *
 
@@ -23,10 +24,11 @@ class PointerEventFilter(QObject):
         t = ev.type()
 
         if t == QMouseEvent.MouseMove:
-            pointer = ev.pointer
-            pos = ev.windowPos() if type(pointer) == Pointer else ev.localPos()
-            self.getPointerWidget(event).move(pos)
+            pos = ev.globalPos()
+            widgetPos = pos - self.qapp.topLevelWidgets()[0].mapToGlobal(QPoint(0, 0))
+            self.getPointerWidget(event).move(widgetPos)
         return False
+
 
     def getPointerWidget(self, ev):
         id = ev.pointer.id()

@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication
 from PyQt5.QtWidgets import QWidget
 
 import wiimote
+from oneEuroFilter import OneEuroFilter
 from pointer import *
 from turnOperation import TurnOperation
 from wiimotePositionMapper import WiiMotePositionMapper
@@ -24,6 +25,14 @@ class WiiMotePointer(Pointer):
 
     def __init__(self, wiimote, qapp, color):
         super(WiiMotePointer, self).__init__(wiimote.btaddr, color)
+        config = {
+            'freq': 120,  # Hz
+            'mincutoff': 1,  #
+            'beta': 0.1,  #
+            'dcutoff': 1.0  # this one should be ok
+        }
+        self.pointFilters = {"x": OneEuroFilter(**config),
+                             "y": OneEuroFilter(**config), }
 
         self.positionMapper = WiiMotePositionMapper()
         self.qapp = qapp  # type: QApplication
@@ -44,7 +53,7 @@ class WiiMotePointer(Pointer):
     def __sendWheelEvent__(self, angle):
         targetWidget, localPos = self.__getLocalEventProperties__()
 
-        wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), abs(angle), Qt.Vertical,
+        wheelEv = QWheelEvent(localPos, self.point, QPoint(0, 0), QPoint(0, angle), angle, Qt.Vertical,
                               self.__mapActiveMouseButtons__(), self.qapp.keyboardModifiers())
         ev = PointerWheelEvent(self, angle, wheelEv)
 
@@ -54,11 +63,11 @@ class WiiMotePointer(Pointer):
         p = self.positionMapper.map(data)
         if not p:
             return
-        x, y = p[0], p[1]
+        x, y = self.pointFilters["x"](p[0]), self.pointFilters["y"](p[1])
 
-        point = QPoint(x, y) - self.qapp.topLevelWidgets()[0].mapToGlobal(QPoint(0, 0))
+        point = QPoint(x, y)
         changed = not self.point == point
-        self.point = QPoint(x, y)
+        self.point = point
         if (changed):
             self.__sendEvent__(QEvent.MouseMove)
 

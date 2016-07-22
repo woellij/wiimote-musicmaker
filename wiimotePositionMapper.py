@@ -42,7 +42,6 @@ class WiiMotePositionMapper(object):
             xSorted.remove(bottomLeft)
             withDistance = list(map(lambda p: (p, np.linalg.norm(np.subtract(bottomLeft, p))), xSorted))
             distSorted = sorted(withDistance, key=itemgetter(1))
-            print(distSorted)
 
             return [distSorted[0][0], distSorted[2][0], distSorted[1][0], bottomLeft]
         except:

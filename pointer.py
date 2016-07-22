@@ -1,3 +1,5 @@
+from PyQt5.QtCore import QEvent
+from PyQt5.QtCore import QObject
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import QUndoStack
 
@@ -8,9 +10,10 @@ class PointerEvent(QMouseEvent):
         self.pointer = pointer
 
 
-class PointerWheelEvent(QWheelEvent):
-    def __init__(self, pointer, angle, qwheelevent):
-        super(PointerWheelEvent, self).__init__(qwheelevent)
+class PointerWheelEvent(QEvent):
+    def __init__(self, pointer, angle, qwheelEvent):
+        super(PointerWheelEvent, self).__init__(QEvent.None_)
+        self.qwheelEvent = qwheelEvent
         self.pointer = pointer
         self.pointerAngleDelta = angle
 

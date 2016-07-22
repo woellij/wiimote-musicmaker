@@ -15,6 +15,7 @@ from forwardPointerWheelEventFilter import SendPointerEventToFirstPlayWidgetFilt
 from pointerEventFilter import PointerEventFilter
 from remapMouseEventFilter import RemapMouseEventFilter
 from undoPointerEventFilter import PointerUndoRedoEventFilter
+from wheelEventFilter import WheelEventFilter
 from wiimotePointer import WiiMotePointer
 from wiimotePointerReceiver import WiiMotePointerReceiver
 from wiimotePositionMapper import WiiMotePositionMapper
@@ -48,7 +49,7 @@ class Program(object):
 
         self.qapp = qapp = Qt.QApplication(sys.argv)
         app = MusicMakerApp()  # type: QWidget
-        app.showFullScreen()
+        app.show()
         app.setMouseTracking(True)
 
         self.colorPick = ColorPick()
@@ -58,7 +59,8 @@ class Program(object):
         self.forwardPointerWheelEventToFirstWidget = SendPointerEventToFirstPlayWidgetFilter(qapp)
         qapp.installEventFilter(self.forwardPointerWheelEventToFirstWidget)
 
-
+        self.wheelEventFilter = WheelEventFilter()
+        qapp.installEventFilter(self.wheelEventFilter)
 
         self.pointerDrawFilter = PointerDrawEventFilter(app, None)
         qapp.installEventFilter(self.pointerDrawFilter)
@@ -85,7 +87,7 @@ class Program(object):
 
         if (len(sys.argv) == 2):
             mac = sys.argv[1]
-            # pointerReceiver.__connect__(mac, "Nintendo RVL-CNT-01-TR")
+            pointerReceiver.__connect__(mac, "Nintendo RVL-CNT-01-TR")
 
     def onExit(self):
         if hasattr(self, "pointerReceiver") and self.pointerReceiver:

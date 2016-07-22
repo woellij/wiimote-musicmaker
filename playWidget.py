@@ -50,26 +50,21 @@ class PlayWidget(QWidget):
         self.sound.setSource(QUrl.fromLocalFile(filename))
         self.update()
 
-    def wheelEvent(self, ev):
-        QWidget.wheelEvent(self, ev)
+    def adjustVolume(self, angle):
+
         vol = self.sound.volume()
-        if type(ev) is QWheelEvent:
-            ev = ev  # type:QWheelEvent
-            a = ev.angleDelta()
-
-            changeVol = 0.05
-            vol = vol + changeVol if a.y() > 0 else vol - changeVol
-
-        elif type(ev) is PointerWheelEvent:
-            ev = ev  # type:PointerWheelEvent
-            dif = ev.pointerAngleDelta * 2
-            dif = dif / 180
-            dif = vol * dif
-            vol += dif
+        dif = angle / 180
+        dif = vol * dif
+        vol += dif
+        print("volume dif ", angle, dif)
 
         if vol > 0 and vol < 1.0:
             self.sound.setVolume(vol)
             self.update()
+
+    def wheelEvent(self, ev):
+        angle = ev.angleDelta().y() / 8
+        self.adjustVolume(angle)
 
     def paintEvent(self, QPaintEvent):
         QWidget.paintEvent(self, QPaintEvent)
