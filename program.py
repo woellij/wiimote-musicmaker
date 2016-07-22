@@ -11,11 +11,9 @@ from app import MusicMakerApp
 from capturePointerDownWheelFilter import CapturePointerWheelEventFilter
 from dragEventFilter import DragEventFilter
 from pointerDrawEventFilter import PointerDrawEventFilter
-from forwardPointerWheelEventFilter import SendPointerEventToFirstPlayWidgetFilter
 from pointerEventFilter import PointerEventFilter
 from remapMouseEventFilter import RemapMouseEventFilter
 from undoPointerEventFilter import PointerUndoRedoEventFilter
-from wheelEventFilter import WheelEventFilter
 from wiimotePointer import WiiMotePointer
 from wiimotePointerReceiver import WiiMotePointerReceiver
 from wiimotePositionMapper import WiiMotePositionMapper
@@ -55,12 +53,6 @@ class Program(object):
         self.colorPick = ColorPick()
         self.remapMousefilter = RemapMouseEventFilter(qapp, self.colorPick)
         qapp.installEventFilter(self.remapMousefilter)
-
-        self.forwardPointerWheelEventToFirstWidget = SendPointerEventToFirstPlayWidgetFilter(qapp)
-        qapp.installEventFilter(self.forwardPointerWheelEventToFirstWidget)
-
-        self.wheelEventFilter = WheelEventFilter()
-        qapp.installEventFilter(self.wheelEventFilter)
 
         self.pointerDrawFilter = PointerDrawEventFilter(app, None)
         qapp.installEventFilter(self.pointerDrawFilter)
