@@ -25,10 +25,10 @@ class PointerDrawEventFilter(QObject):
         if t == QtGui.QKeyEvent.MouseButtonRelease and event.button() & QtCore.Qt.LeftButton:
             return self.mouseReleaseEvent(event)
         elif t == QtGui.QMouseEvent.MouseMove and event.buttons() & QtCore.Qt.LeftButton:
-            return self.mouseMoveEvent(event)
+            return self.pressedLeftButtonMouseMoveEvent(event)
         return False
 
-    def mouseMoveEvent(self, ev):
+    def pressedLeftButtonMouseMoveEvent(self, ev):
         points = self.pointerPoints.get(ev.pointer, None)
         if not points:
             self.pointerPoints[ev.pointer] = points = []
@@ -55,11 +55,10 @@ class PointerDrawEventFilter(QObject):
 
     def drawPoints(self, qp):
         for pointer, points in self.pointerPoints.items():
-            if not points:
-                continue
-            qp.setBrush(pointer.color)
-            qp.setPen(pointer.color)
-            qp.drawPolyline(self.poly(points))
+            if points and len(points) > 0:
+                qp.setBrush(pointer.color)
+                qp.setPen(pointer.color)
+                qp.drawPolyline(self.poly(points))
 
-            for point in points:
-                qp.drawEllipse(point.x() - 1, point.y() - 1, 2, 2)
+                for point in points:
+                    qp.drawEllipse(point.x() - 1, point.y() - 1, 2, 2)
